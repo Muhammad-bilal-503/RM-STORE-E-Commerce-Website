@@ -1,240 +1,205 @@
-const Analytics = require('../models/analyticsModel');
 const Order = require('../models/orderModel');
 const Product = require('../models/productModel');
 const User = require('../models/userModel');
 
-// Generate daily analytics
-exports.generateDailyAnalytics = async () => {
+// All analytics here are computed live from the real Order/Product/User
+// collections on every request — there is no cached/pre-aggregated snapshot
+// to go stale, so placing an order, adding a product, or a new signup is
+// reflected immediately on the next request.
+
+// @desc    Real-time dashboard summary (stat cards, recent orders, top products)
+// @route   GET /api/analytics/dashboard
+// @access  Private/Admin
+exports.getDashboardStats = async (req, res) => {
   try {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const [totalProducts, totalCustomers, revenueAgg, totalOrders] = await Promise.all([
+      Product.countDocuments(),
+      User.countDocuments({ isAdmin: { $ne: true } }),
+      Order.aggregate([
+        { $match: { isPaid: true } },
+        { $group: { _id: null, total: { $sum: '$totalPrice' } } },
+      ]),
+      Order.countDocuments(),
+    ]);
 
-    // Get today's orders
-    const orders = await Order.find({
-      createdAt: {
-        $gte: today,
-        $lt: new Date(today.getTime() + 24 * 60 * 60 * 1000)
-      }
-    }).populate('items.product');
+    const totalRevenue = revenueAgg[0]?.total || 0;
 
-    // Calculate metrics
-    const totalSales = orders.reduce((sum, order) => sum + order.totalAmount, 0);
-    const totalOrders = orders.length;
-    const averageOrderValue = totalOrders > 0 ? totalSales / totalOrders : 0;
+    const recentOrders = await Order.find({})
+      .populate('user', 'name email')
+      .sort({ createdAt: -1 })
+      .limit(5);
 
-    // Get top products
-    const productSales = {};
-    orders.forEach(order => {
-      order.items.forEach(item => {
-        if (!productSales[item.product._id]) {
-          productSales[item.product._id] = {
-            productId: item.product._id,
-            name: item.product.name,
-            quantity: 0,
-            revenue: 0
-          };
-        }
-        productSales[item.product._id].quantity += item.quantity;
-        productSales[item.product._id].revenue += item.price * item.quantity;
-      });
-    });
-
-    const topProducts = Object.values(productSales)
-      .sort((a, b) => b.revenue - a.revenue)
-      .slice(0, 5);
-
-    // Get customer metrics
-    const newCustomers = await User.countDocuments({
-      createdAt: {
-        $gte: today,
-        $lt: new Date(today.getTime() + 24 * 60 * 60 * 1000)
-      }
-    });
-
-    const returningCustomers = orders.length - newCustomers;
-
-    // Get category performance
-    const categorySales = {};
-    orders.forEach(order => {
-      order.items.forEach(item => {
-        const category = item.product.category;
-        if (!categorySales[category]) {
-          categorySales[category] = {
-            category,
-            sales: 0,
-            orders: 0
-          };
-        }
-        categorySales[category].sales += item.price * item.quantity;
-        categorySales[category].orders += 1;
-      });
-    });
-
-    const categoryPerformance = Object.values(categorySales);
-
-    // Save analytics
-    const analytics = new Analytics({
-      type: 'sales',
-      date: today,
-      period: 'daily',
-      metrics: {
-        totalSales,
-        totalOrders,
-        averageOrderValue,
-        topProducts,
-        customerMetrics: {
-          newCustomers,
-          returningCustomers
+    const topProducts = await Order.aggregate([
+      { $unwind: '$orderItems' },
+      {
+        $group: {
+          _id: '$orderItems.product',
+          name: { $first: '$orderItems.name' },
+          sales: { $sum: '$orderItems.qty' },
+          revenue: { $sum: { $multiply: ['$orderItems.price', '$orderItems.qty'] } },
         },
-        categoryPerformance
-      }
+      },
+      { $sort: { revenue: -1 } },
+      { $limit: 5 },
+    ]);
+
+    res.json({
+      totalRevenue,
+      totalOrders,
+      totalProducts,
+      totalCustomers,
+      recentOrders: recentOrders.map((order) => ({
+        _id: order._id,
+        customer: order.user?.name || 'Unknown',
+        amount: order.totalPrice,
+        status: order.status,
+        date: order.createdAt,
+      })),
+      topProducts,
     });
-
-    await analytics.save();
-    return analytics;
-  } catch (error) {
-    console.error('Error generating daily analytics:', error);
-    throw error;
-  }
-};
-
-// Get analytics for a specific period
-exports.getAnalytics = async (req, res) => {
-  try {
-    const { type, period, startDate, endDate } = req.query;
-    
-    const query = {};
-    if (type) query.type = type;
-    if (period) query.period = period;
-    if (startDate && endDate) {
-      query.date = {
-        $gte: new Date(startDate),
-        $lte: new Date(endDate)
-      };
-    }
-
-    const analytics = await Analytics.find(query)
-      .sort({ date: -1 })
-      .limit(100);
-
-    res.json(analytics);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-// Get sales report
+// @desc    Sales report over a date range, grouped by day
+// @route   GET /api/analytics/sales?startDate=&endDate=
+// @access  Private/Admin
 exports.getSalesReport = async (req, res) => {
   try {
     const { startDate, endDate } = req.query;
-    
-    const query = {
-      type: 'sales',
-      date: {
-        $gte: new Date(startDate),
-        $lte: new Date(endDate)
-      }
-    };
+    const match = { isPaid: true };
+    if (startDate && endDate) {
+      match.createdAt = { $gte: new Date(startDate), $lte: new Date(endDate) };
+    }
 
-    const analytics = await Analytics.find(query)
-      .sort({ date: 1 });
+    const daily = await Order.aggregate([
+      { $match: match },
+      {
+        $group: {
+          _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
+          totalSales: { $sum: '$totalPrice' },
+          totalOrders: { $sum: 1 },
+        },
+      },
+      { $sort: { _id: 1 } },
+    ]);
 
-    // Calculate summary
-    const summary = analytics.reduce((acc, curr) => {
-      acc.totalSales += curr.metrics.totalSales;
-      acc.totalOrders += curr.metrics.totalOrders;
-      acc.averageOrderValue = acc.totalSales / acc.totalOrders;
-      return acc;
-    }, {
-      totalSales: 0,
-      totalOrders: 0,
-      averageOrderValue: 0
-    });
+    const summary = daily.reduce(
+      (acc, day) => {
+        acc.totalSales += day.totalSales;
+        acc.totalOrders += day.totalOrders;
+        return acc;
+      },
+      { totalSales: 0, totalOrders: 0 }
+    );
+    summary.averageOrderValue = summary.totalOrders > 0 ? summary.totalSales / summary.totalOrders : 0;
 
-    res.json({
-      summary,
-      details: analytics
-    });
+    res.json({ summary, details: daily });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-// Get product performance report
+// @desc    Product performance report (units sold / revenue per product)
+// @route   GET /api/analytics/products
+// @access  Private/Admin
 exports.getProductReport = async (req, res) => {
   try {
     const { startDate, endDate } = req.query;
-    
-    const query = {
-      type: 'sales',
-      date: {
-        $gte: new Date(startDate),
-        $lte: new Date(endDate)
-      }
-    };
+    const match = {};
+    if (startDate && endDate) {
+      match.createdAt = { $gte: new Date(startDate), $lte: new Date(endDate) };
+    }
 
-    const analytics = await Analytics.find(query)
-      .sort({ date: 1 });
+    const productPerformance = await Order.aggregate([
+      { $match: match },
+      { $unwind: '$orderItems' },
+      {
+        $group: {
+          _id: '$orderItems.product',
+          name: { $first: '$orderItems.name' },
+          totalQuantity: { $sum: '$orderItems.qty' },
+          totalRevenue: { $sum: { $multiply: ['$orderItems.price', '$orderItems.qty'] } },
+        },
+      },
+      { $sort: { totalRevenue: -1 } },
+    ]);
 
-    // Aggregate product performance
-    const productPerformance = {};
-    analytics.forEach(record => {
-      record.metrics.topProducts.forEach(product => {
-        if (!productPerformance[product.productId]) {
-          productPerformance[product.productId] = {
-            name: product.name,
-            totalQuantity: 0,
-            totalRevenue: 0
-          };
-        }
-        productPerformance[product.productId].totalQuantity += product.quantity;
-        productPerformance[product.productId].totalRevenue += product.revenue;
-      });
+    res.json({ productPerformance });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Customer report (new vs returning, based on real orders/signups)
+// @route   GET /api/analytics/customers
+// @access  Private/Admin
+exports.getCustomerReport = async (req, res) => {
+  try {
+    const { startDate, endDate } = req.query;
+    const dateMatch = {};
+    if (startDate && endDate) {
+      dateMatch.createdAt = { $gte: new Date(startDate), $lte: new Date(endDate) };
+    }
+
+    const newCustomers = await User.countDocuments({
+      isAdmin: { $ne: true },
+      ...dateMatch,
     });
 
+    // A "returning" customer is one with more than one order
+    const returningAgg = await Order.aggregate([
+      { $group: { _id: '$user', orderCount: { $sum: 1 } } },
+      { $match: { orderCount: { $gt: 1 } } },
+      { $count: 'returningCustomers' },
+    ]);
+
     res.json({
-      productPerformance: Object.values(productPerformance)
-        .sort((a, b) => b.totalRevenue - a.totalRevenue)
+      customerMetrics: {
+        newCustomers,
+        returningCustomers: returningAgg[0]?.returningCustomers || 0,
+      },
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-// Get customer analytics report
-exports.getCustomerReport = async (req, res) => {
+// @desc    Category performance (sales/orders per product category, from real orders)
+// @route   GET /api/analytics/categories
+// @access  Private/Admin
+exports.getCategoryPerformance = async (req, res) => {
   try {
-    const { startDate, endDate } = req.query;
-    
-    const query = {
-      type: 'sales',
-      date: {
-        $gte: new Date(startDate),
-        $lte: new Date(endDate)
-      }
-    };
-
-    const analytics = await Analytics.find(query)
-      .sort({ date: 1 });
-
-    // Aggregate customer metrics
-    const customerMetrics = analytics.reduce((acc, curr) => {
-      acc.newCustomers += curr.metrics.customerMetrics.newCustomers;
-      acc.returningCustomers += curr.metrics.customerMetrics.returningCustomers;
-      return acc;
-    }, {
-      newCustomers: 0,
-      returningCustomers: 0
-    });
+    const categoryPerformance = await Order.aggregate([
+      { $unwind: '$orderItems' },
+      {
+        $lookup: {
+          from: 'products',
+          localField: 'orderItems.product',
+          foreignField: '_id',
+          as: 'productInfo',
+        },
+      },
+      { $unwind: '$productInfo' },
+      {
+        $group: {
+          _id: '$productInfo.category',
+          sales: { $sum: { $multiply: ['$orderItems.price', '$orderItems.qty'] } },
+          orders: { $sum: 1 },
+        },
+      },
+      { $sort: { sales: -1 } },
+    ]);
 
     res.json({
-      customerMetrics,
-      details: analytics.map(record => ({
-        date: record.date,
-        metrics: record.metrics.customerMetrics
-      }))
+      categoryPerformance: categoryPerformance.map((c) => ({
+        category: c._id,
+        sales: c.sales,
+        orders: c.orders,
+      })),
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
-}; 
+};

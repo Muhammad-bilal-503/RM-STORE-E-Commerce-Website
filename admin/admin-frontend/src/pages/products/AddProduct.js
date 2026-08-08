@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import "./AddProduct.css"
 import api from "../../services/api"
 
@@ -31,11 +31,14 @@ function AddProduct() {
 
   const [successMessage, setSuccessMessage] = useState("")
   const [errorMessage, setErrorMessage] = useState("")
+  const [categories, setCategories] = useState([])
 
-  const categories = [
-    "flours", "grains", "spices", "oils", "dairy", "vegetables",
-    "fruits", "meat", "seafood", "beverages", "snacks", "bakery"
-  ]
+  useEffect(() => {
+    api
+      .get("/products/categories")
+      .then(({ data }) => setCategories(data))
+      .catch(() => setCategories([]))
+  }, [])
 
   const handleInputChange = (field, value) => {
     setProductData((prev) => ({ ...prev, [field]: value }))
@@ -173,19 +176,19 @@ function AddProduct() {
             <div className="form-row">
               <div className="form-group">
                 <label htmlFor="category">Category *</label>
-                <select
+                <input
                   id="category"
+                  list="category-options"
                   value={productData.category}
                   onChange={(e) => handleInputChange("category", e.target.value)}
+                  placeholder="Pick an existing category or type a new one"
                   required
-                >
-                  <option value="">Select category</option>
+                />
+                <datalist id="category-options">
                   {categories.map((category) => (
-                    <option key={category} value={category}>
-                      {category.charAt(0).toUpperCase() + category.slice(1)}
-                    </option>
+                    <option key={category} value={category} />
                   ))}
-                </select>
+                </datalist>
               </div>
               <div className="form-group">
                 <label htmlFor="weight">Weight</label>

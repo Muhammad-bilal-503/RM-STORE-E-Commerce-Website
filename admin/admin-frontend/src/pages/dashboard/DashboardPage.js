@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { subDays } from 'date-fns';
+import api from '../../services/api';
 
 function DashboardPage() {
   const navigate = useNavigate();
@@ -14,35 +14,42 @@ function DashboardPage() {
   });
   const [loading, setLoading] = useState(true);
 
+  const [error, setError] = useState('');
+
   useEffect(() => {
-    // Simulate loading dashboard data
-    setTimeout(() => {
-      setStats({
-        totalRevenue: 45230,
-        totalOrders: 156,
-        totalProducts: 48,
-        totalCustomers: 234,
-        recentOrders: [
-          { id: '001', customer: 'John Doe', amount: 245.50, status: 'completed', date: new Date() },
-          { id: '002', customer: 'Jane Smith', amount: 189.00, status: 'pending', date: subDays(new Date(), 1) },
-          { id: '003', customer: 'Mike Johnson', amount: 367.25, status: 'processing', date: subDays(new Date(), 2) },
-        ],
-        topProducts: [
-          { name: 'Premium Basmati Rice', sales: 145, revenue: 4350 },
-          { name: 'Organic Honey', sales: 98, revenue: 2940 },
-          { name: 'Mixed Dry Fruits', sales: 76, revenue: 2280 },
-        ]
-      });
-      setLoading(false);
-    }, 1000);
+    const fetchStats = async () => {
+      try {
+        setLoading(true);
+        const { data } = await api.get('/analytics/dashboard');
+        setStats({
+          totalRevenue: data.totalRevenue,
+          totalOrders: data.totalOrders,
+          totalProducts: data.totalProducts,
+          totalCustomers: data.totalCustomers,
+          recentOrders: data.recentOrders.map((order) => ({
+            id: order._id,
+            customer: order.customer,
+            amount: order.amount,
+            status: order.status,
+            date: order.date,
+          })),
+          topProducts: data.topProducts,
+        });
+        setError('');
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to load dashboard data');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
   }, []);
 
   const statCards = [
     {
       title: 'Total Revenue',
       value: `$${stats.totalRevenue.toLocaleString()}`,
-      change: '+12.5%',
-      trend: 'up',
       icon: (
         <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
@@ -53,8 +60,6 @@ function DashboardPage() {
     {
       title: 'Total Orders',
       value: stats.totalOrders,
-      change: '+8.2%',
-      trend: 'up',
       icon: (
         <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
@@ -65,8 +70,6 @@ function DashboardPage() {
     {
       title: 'Total Products',
       value: stats.totalProducts,
-      change: '+3.1%',
-      trend: 'up',
       icon: (
         <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
@@ -77,8 +80,6 @@ function DashboardPage() {
     {
       title: 'Total Customers',
       value: stats.totalCustomers,
-      change: '+15.3%',
-      trend: 'up',
       icon: (
         <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
@@ -141,6 +142,14 @@ function DashboardPage() {
     );
   }
 
+  if (error) {
+    return (
+      <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl p-6">
+        {error}
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -157,10 +166,6 @@ function DashboardPage() {
               <div>
                 <p className="text-gray-500 text-sm font-medium">{stat.title}</p>
                 <p className="text-2xl font-bold text-gray-900 mt-1">{stat.value}</p>
-                <div className="flex items-center mt-2">
-                  <span className="text-green-600 text-sm font-medium">{stat.change}</span>
-                  <span className="text-gray-500 text-sm ml-1">from last month</span>
-                </div>
               </div>
               <div className={`w-12 h-12 bg-gradient-to-r ${stat.color} rounded-xl flex items-center justify-center text-white`}>
                 {stat.icon}

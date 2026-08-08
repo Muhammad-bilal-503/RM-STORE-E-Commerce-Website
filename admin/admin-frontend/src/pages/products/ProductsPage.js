@@ -14,7 +14,7 @@ function ProductsPage() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
 
-  const categories = ['all', 'flours', 'grains', 'spices', 'oils', 'dairy', 'vegetables', 'fruits', 'meat', 'seafood', 'beverages', 'snacks', 'bakery'];
+  const [categories, setCategories] = useState(['all']);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -31,7 +31,17 @@ function ProductsPage() {
       }
     };
 
+    const fetchCategories = async () => {
+      try {
+        const { data } = await api.get('/products/categories');
+        setCategories(['all', ...data]);
+      } catch (err) {
+        setCategories(['all']);
+      }
+    };
+
     fetchProducts();
+    fetchCategories();
   }, []);
 
   useEffect(() => {

@@ -11,16 +11,7 @@ const RecipesPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const categories = [
-    'all',
-    'breakfast',
-    'lunch',
-    'dinner',
-    'dessert',
-    'snacks',
-    'vegetarian',
-    'vegan',
-  ];
+  const [categories, setCategories] = useState(['all']);
 
   useEffect(() => {
     const fetchRecipes = async () => {
@@ -35,7 +26,17 @@ const RecipesPage = () => {
       }
     };
 
+    const fetchCategories = async () => {
+      try {
+        const { data } = await axiosInstance.get('/recipes/categories');
+        setCategories(['all', ...data]);
+      } catch (err) {
+        setCategories(['all']);
+      }
+    };
+
     fetchRecipes();
+    fetchCategories();
   }, []);
 
   const filteredRecipes = recipes.filter((recipe) => {

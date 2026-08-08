@@ -60,6 +60,29 @@ export const updateUserProfile = createAsyncThunk(
   }
 );
 
+// Fetch the logged-in user's current profile from the database
+// (used so the profile page always reflects real, live data rather than
+// only what was cached in localStorage at login time)
+export const fetchUserProfile = createAsyncThunk(
+  'user/fetchProfile',
+  async (_, { rejectWithValue }) => {
+    try {
+      const { data } = await axiosInstance.get('/users/profile');
+      // Merge fresh data into what's stored, preserving the existing token
+      const stored = JSON.parse(localStorage.getItem('userInfo') || '{}');
+      const merged = { ...stored, ...data };
+      localStorage.setItem('userInfo', JSON.stringify(merged));
+      return merged;
+    } catch (error) {
+      return rejectWithValue(
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.message
+      );
+    }
+  }
+);
+
 const initialState = {
   userInfo: userInfoFromStorage,
   loading: false,
@@ -128,6 +151,10 @@ const userSlice = createSlice({
       .addCase(updateUserProfile.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+      // Fetch fresh profile
+      .addCase(fetchUserProfile.fulfilled, (state, action) => {
+        state.userInfo = action.payload;
       });
   },
 });

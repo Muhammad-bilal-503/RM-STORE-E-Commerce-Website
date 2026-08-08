@@ -8,12 +8,14 @@ const {
   deleteRecipe,
   getFeaturedRecipes,
   getRecipesByProduct,
+  getRecipeCategories,
 } = require('../controllers/recipeController');
 const { protect, admin } = require('../middlewares/authMiddleware');
 
 // Public routes
 router.get('/', getRecipes);
 router.get('/featured', getFeaturedRecipes);
+router.get('/categories', getRecipeCategories);
 router.get('/product/:productId', getRecipesByProduct);
 router.get('/:id', getRecipeById);
 

@@ -1,21 +1,21 @@
 const express = require('express');
 const router = express.Router();
-const analyticsController = require('../controllers/analyticsController');
+const {
+  getDashboardStats,
+  getSalesReport,
+  getProductReport,
+  getCustomerReport,
+  getCategoryPerformance,
+} = require('../controllers/analyticsController');
 const { protect, admin } = require('../middlewares/authMiddleware');
 
-// Analytics data is admin-only
+// All analytics endpoints are admin-only and computed live from real data
 router.use(protect, admin);
 
-// Get analytics data
-router.get('/', analyticsController.getAnalytics);
+router.get('/dashboard', getDashboardStats);
+router.get('/sales', getSalesReport);
+router.get('/products', getProductReport);
+router.get('/customers', getCustomerReport);
+router.get('/categories', getCategoryPerformance);
 
-// Get sales report
-router.get('/sales', analyticsController.getSalesReport);
-
-// Get product performance report
-router.get('/products', analyticsController.getProductReport);
-
-// Get customer analytics report
-router.get('/customers', analyticsController.getCustomerReport);
-
-module.exports = router; 
+module.exports = router;

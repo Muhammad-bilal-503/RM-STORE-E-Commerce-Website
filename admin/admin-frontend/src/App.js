@@ -16,6 +16,7 @@ import OrdersPage from './pages/orders/OrdersPage';
 import AddRecipe from './pages/recipe/AddRecipe';
 import InventoryPage from './pages/inventory/InventoryPage';
 import AnalyticsPage from './pages/analytics/AnalyticsPage';
+import ProfilePage from './pages/profile/ProfilePage';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -84,6 +85,7 @@ function App() {
             <Route path="add-recipe" element={<AddRecipe />} />
             <Route path="inventory" element={<InventoryPage />} />
             <Route path="analytics" element={<AnalyticsPage />} />
+            <Route path="profile" element={<ProfilePage />} />
           </Route>
 
           {/* 404 / fallback */}

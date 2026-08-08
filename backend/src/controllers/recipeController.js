@@ -226,6 +226,14 @@ const getRecipesByProduct = asyncHandler(async (req, res) => {
   }
 });
 
+// @desc    Get all distinct recipe categories currently in use
+// @route   GET /api/recipes/categories
+// @access  Public
+const getRecipeCategories = asyncHandler(async (req, res) => {
+  const categories = await Recipe.distinct('category');
+  res.json(categories.filter(Boolean).sort());
+});
+
 module.exports = {
   getRecipes,
   getRecipeById,
@@ -234,4 +242,5 @@ module.exports = {
   deleteRecipe,
   getFeaturedRecipes,
   getRecipesByProduct,
+  getRecipeCategories,
 }; 

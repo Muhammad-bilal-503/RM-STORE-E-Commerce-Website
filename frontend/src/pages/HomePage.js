@@ -8,9 +8,6 @@ import { FaShoppingBasket, FaLeaf, FaArrowRight } from 'react-icons/fa';
 import ProductCard from '../components/products/ProductCard';
 import RecipeCard from '../components/recipes/RecipeCard';
 
-// Dummy recipes
-
-
 const HomePage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -169,16 +166,16 @@ const HomePage = () => {
           </motion.div>
           
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-            {[
-              { name: 'Flours', image: 'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80', description: 'Premium Grains' },
-              { name: 'Rice', image: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80', description: 'Aromatic Varieties' },
-              { name: 'Honey', image: 'https://images.unsplash.com/photo-1587049352846-4a222e784d38?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80', description: 'Pure & Natural' },
-              { name: 'Dry Fruits', image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80', description: 'Nutritious Mix' },
-              { name: 'Dates', image: 'https://images.unsplash.com/photo-1623781624461-b9b67ac73c3a?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80', description: 'Sweet & Fresh' },
-              { name: 'Spices', image: 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80', description: 'Authentic Flavors' }
-            ].map((category, index) => (
+            {Array.from(
+              Products.reduce((map, product) => {
+                if (product.category && !map.has(product.category)) {
+                  map.set(product.category, product);
+                }
+                return map;
+              }, new Map())
+            ).map(([categoryName, representativeProduct], index) => (
               <motion.div
-                key={index}
+                key={categoryName}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
@@ -186,24 +183,21 @@ const HomePage = () => {
                 whileHover={{ y: -10 }}
               >
                 <Link
-                  to={`/products/category/${category.name.toLowerCase().replace(' ', '')}`}
+                  to={`/products/category/${categoryName}`}
                   className="group block bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
                 >
                   <div className="relative h-40 overflow-hidden">
                     <img
-                      src={category.image}
-                      alt={category.name}
+                      src={representativeProduct.image}
+                      alt={categoryName}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   </div>
                   <div className="p-4 text-center">
-                    <h3 className="font-bold text-lg text-gray-900 group-hover:text-green-700 transition-colors duration-300 mb-1">
-                      {category.name}
+                    <h3 className="font-bold text-lg text-gray-900 group-hover:text-green-700 transition-colors duration-300 mb-1 capitalize">
+                      {categoryName}
                     </h3>
-                    <p className="text-sm text-gray-600 group-hover:text-gray-700 transition-colors duration-300">
-                      {category.description}
-                    </p>
                   </div>
                 </Link>
               </motion.div>

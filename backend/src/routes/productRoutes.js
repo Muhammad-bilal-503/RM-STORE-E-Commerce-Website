@@ -11,12 +11,14 @@ const {
   getFeaturedProducts,
   getProductsByCategory,
   getRelatedProducts,
+  getProductCategories,
 } = require('../controllers/productController');
 const { protect, admin } = require('../middlewares/authMiddleware');
 
 // Public routes
 router.get('/top', getTopProducts);
 router.get('/featured', getFeaturedProducts);
+router.get('/categories', getProductCategories);
 router.get('/category/:category', getProductsByCategory);
 router.get('/:id/related', getRelatedProducts);
 router.get('/:id', getProductById);

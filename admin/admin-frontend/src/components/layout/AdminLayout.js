@@ -65,6 +65,14 @@ function AdminLayout({ onLogout }) {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const adminInfo = (() => {
+    try {
+      return JSON.parse(localStorage.getItem('adminInfo')) || {};
+    } catch {
+      return {};
+    }
+  })();
+
   const handleLogout = () => {
     onLogout();
     setUserMenuOpen(false);
@@ -106,7 +114,7 @@ function AdminLayout({ onLogout }) {
         <div className="absolute bottom-0 left-0 right-0 p-4">
           <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-3 border border-blue-100">
             <p className="text-xs text-gray-600 font-medium">RM Store Admin v1.0</p>
-            <p className="text-xs text-gray-500">© 2024 RM Store</p>
+            <p className="text-xs text-gray-500">© {new Date().getFullYear()} RM Store</p>
           </div>
         </div>
       </aside>
@@ -185,7 +193,7 @@ function AdminLayout({ onLogout }) {
                     </svg>
                   </div>
                   <div className="hidden md:block text-left">
-                    <p className="text-sm font-medium">Admin User</p>
+                    <p className="text-sm font-medium">{adminInfo.name || 'Admin'}</p>
                     <p className="text-xs text-gray-500">Administrator</p>
                   </div>
                   <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -195,12 +203,15 @@ function AdminLayout({ onLogout }) {
                 {userMenuOpen && (
                   <div className="absolute right-0 top-12 w-56 bg-white rounded-xl shadow-xl py-2 border border-gray-200 z-20">
                     <div className="px-4 py-3 border-b border-gray-100">
-                      <p className="text-sm font-medium text-gray-900">Admin User</p>
-                      <p className="text-xs text-gray-500">admin@rmstore.com</p>
+                      <p className="text-sm font-medium text-gray-900">{adminInfo.name || 'Admin'}</p>
+                      <p className="text-xs text-gray-500">{adminInfo.email || ''}</p>
                     </div>
                     <button
                       className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200 flex items-center space-x-2"
-                      onClick={() => setUserMenuOpen(false)}
+                      onClick={() => {
+                        setUserMenuOpen(false);
+                        navigate('/profile');
+                      }}
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />

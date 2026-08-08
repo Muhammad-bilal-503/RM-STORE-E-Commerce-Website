@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import "./AddRecipe.css"
 import api from "../../services/api"
 
@@ -30,20 +30,14 @@ function AddRecipe() {
   const [newStep, setNewStep] = useState("")
   const [errorMessage, setErrorMessage] = useState("")
   const [successMessage, setSuccessMessage] = useState("")
+  const [categories, setCategories] = useState([])
 
-  const categories = [
-    "breakfast",
-    "lunch",
-    "dinner",
-    "appetizer",
-    "dessert",
-    "snack",
-    "beverage",
-    "soup",
-    "salad",
-    "main",
-    "side",
-  ]
+  useEffect(() => {
+    api
+      .get("/recipes/categories")
+      .then(({ data }) => setCategories(data))
+      .catch(() => setCategories([]))
+  }, [])
 
   const difficultyLevels = ["Easy", "Medium", "Hard"]
 
@@ -217,19 +211,19 @@ function AddRecipe() {
             <div className="form-row">
               <div className="form-group">
                 <label htmlFor="category">Category *</label>
-                <select
+                <input
                   id="category"
+                  list="recipe-category-options"
                   value={recipeData.category}
                   onChange={(e) => handleInputChange("category", e.target.value)}
+                  placeholder="Pick an existing category or type a new one"
                   required
-                >
-                  <option value="">Select category</option>
+                />
+                <datalist id="recipe-category-options">
                   {categories.map((category) => (
-                    <option key={category} value={category}>
-                      {category.charAt(0).toUpperCase() + category.slice(1)}
-                    </option>
+                    <option key={category} value={category} />
                   ))}
-                </select>
+                </datalist>
               </div>
               <div className="form-group">
                 <label htmlFor="difficulty">Difficulty</label>

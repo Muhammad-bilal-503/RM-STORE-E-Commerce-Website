@@ -252,3 +252,18 @@ exports.getRelatedProducts = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+// Get all distinct categories currently in use across products
+// This is the single source of truth for categories everywhere in the app —
+// there is no hardcoded category list. Adding a product with a new category
+// makes it appear here automatically; once no products use a category, it
+// stops appearing.
+exports.getProductCategories = async (req, res) => {
+  try {
+    const categories = await Product.distinct('category');
+    res.json(categories.filter(Boolean).sort());
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+

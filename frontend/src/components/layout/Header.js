@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { FaShoppingCart, FaUser, FaHeart, FaSearch, FaBars, FaTimes } from 'react-icons/fa';
@@ -7,8 +7,10 @@ import { clearCartItems } from '../../slices/cartSlice';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  
+  const profileMenuRef = useRef(null);
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
   
@@ -16,8 +18,20 @@ const Header = () => {
   const { userInfo } = useSelector((state) => state.auth);
   
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
-  
+
+  // Close the profile dropdown on outside click, so it never gets stuck open
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (profileMenuRef.current && !profileMenuRef.current.contains(event.target)) {
+        setIsProfileMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   const logoutHandler = () => {
+    setIsProfileMenuOpen(false);
     dispatch(logout());
     dispatch(clearCartItems());
     navigate('/login');
@@ -111,32 +125,38 @@ const Header = () => {
               )}
             </Link>
             {userInfo ? (
-              <div className="relative group">
-                <button className="text-gray-700 hover:text-green-600 transition duration-300">
+              <div className="relative" ref={profileMenuRef}>
+                <button
+                  onClick={() => setIsProfileMenuOpen((prev) => !prev)}
+                  className="text-gray-700 hover:text-green-600 transition duration-300"
+                >
                   <FaUser size={20} />
                 </button>
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 hidden group-hover:block">
-                  <Link
-                    to="/profile"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    Profile
-                  </Link>
-                  {userInfo.isAdmin && (
+                {isProfileMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-30">
                     <Link
-                      to="/admin/dashboard"
+                      to="/profile"
+                      onClick={() => setIsProfileMenuOpen(false)}
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     >
-                      Admin Dashboard
+                      Profile
                     </Link>
-                  )}
-                  <button
-                    onClick={logoutHandler}
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    Logout
-                  </button>
-                </div>
+                    {userInfo.isAdmin && process.env.REACT_APP_ADMIN_URL && (
+                      <a
+                        href={process.env.REACT_APP_ADMIN_URL}
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      >
+                        Admin Dashboard
+                      </a>
+                    )}
+                    <button
+                      onClick={logoutHandler}
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      Logout
+                    </button>
+                  </div>
+                )}
               </div>
             ) : (
               <Link
@@ -220,14 +240,14 @@ const Header = () => {
                   >
                     Profile
                   </Link>
-                  {userInfo.isAdmin && (
-                    <Link
-                      to="/admin/dashboard"
+                  {userInfo.isAdmin && process.env.REACT_APP_ADMIN_URL && (
+                    <a
+                      href={process.env.REACT_APP_ADMIN_URL}
                       className="text-gray-700 hover:text-green-600 font-medium py-2"
                       onClick={toggleMenu}
                     >
                       Admin Dashboard
-                    </Link>
+                    </a>
                   )}
                   <button
                     onClick={() => {

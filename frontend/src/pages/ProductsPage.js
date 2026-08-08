@@ -16,15 +16,7 @@ const ProductsPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const categories = [
-    { value: 'all', label: 'All Products', count: 0 },
-    { value: 'Flours', label: 'Flours', count: 0 },
-    { value: 'Rice', label: 'Rice', count: 0 },
-    { value: 'Honey', label: 'Honey', count: 0 },
-    { value: 'Dry Fruits', label: 'Dry Fruits', count: 0 },
-    { value: 'Dates', label: 'Dates', count: 0 },
-    { value: 'Spices', label: 'Spices', count: 0 }
-  ];
+  const [categories, setCategories] = useState([{ value: 'all', label: 'All Products' }]);
 
   const sortOptions = [
     { value: 'newest', label: 'Newest First' },
@@ -60,6 +52,24 @@ const ProductsPage = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const { data } = await axiosInstance.get('/products/categories');
+        setCategories([
+          { value: 'all', label: 'All Products' },
+          ...data.map((cat) => ({
+            value: cat,
+            label: cat.charAt(0).toUpperCase() + cat.slice(1),
+          })),
+        ]);
+      } catch (err) {
+        setCategories([{ value: 'all', label: 'All Products' }]);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   const filterAndSortProducts = useCallback(() => {
     let filtered = products.filter((product) => {

@@ -5,51 +5,32 @@ import { motion } from 'framer-motion';
 import { FaHeart, FaShoppingCart, FaTrash, FaEye } from 'react-icons/fa';
 import { toast } from 'react-hot-toast';
 import { addToCart } from '../slices/cartSlice';
+import axiosInstance from '../utils/axios';
 
 const WishlistPage = () => {
   const dispatch = useDispatch();
   const [wishlistItems, setWishlistItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Mock wishlist data - in a real app, this would come from Redux store or API
   useEffect(() => {
-    // Simulate API call
-    setTimeout(() => {
-      const mockWishlist = [
-        {
-          _id: '1',
-          name: 'Premium Basmati Rice',
-          price: 299,
-          image: '/api/placeholder/300/300',
-          description: 'Long grain aromatic basmati rice',
-          inStock: true,
-          rating: 4.5,
-          numReviews: 150
-        },
-        {
-          _id: '2',
-          name: 'Organic Honey',
-          price: 450,
-          image: '/api/placeholder/300/300',
-          description: 'Pure organic wildflower honey',
-          inStock: true,
-          rating: 4.8,
-          numReviews: 89
-        },
-        {
-          _id: '3',
-          name: 'Mixed Dry Fruits',
-          price: 650,
-          image: '/api/placeholder/300/300',
-          description: 'Premium quality mixed dry fruits',
-          inStock: false,
-          rating: 4.6,
-          numReviews: 203
-        }
-      ];
-      setWishlistItems(mockWishlist);
-      setLoading(false);
-    }, 1000);
+    const fetchWishlist = async () => {
+      try {
+        setLoading(true);
+        const { data } = await axiosInstance.get('/users/wishlist');
+        setWishlistItems(
+          data.map((product) => ({
+            ...product,
+            inStock: (product.variants || []).some((v) => v.countInStock > 0),
+          }))
+        );
+      } catch (err) {
+        toast.error(err.response?.data?.message || 'Failed to load wishlist');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchWishlist();
   }, []);
 
   const handleAddToCart = (product) => {
@@ -64,9 +45,14 @@ const WishlistPage = () => {
     toast.success(`${product.name} added to cart!`);
   };
 
-  const handleRemoveFromWishlist = (productId) => {
-    setWishlistItems(prev => prev.filter(item => item._id !== productId));
-    toast.success('Item removed from wishlist');
+  const handleRemoveFromWishlist = async (productId) => {
+    try {
+      await axiosInstance.delete(`/users/wishlist/${productId}`);
+      setWishlistItems(prev => prev.filter(item => item._id !== productId));
+      toast.success('Item removed from wishlist');
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to remove item');
+    }
   };
 
   const handleMoveToCart = (product) => {

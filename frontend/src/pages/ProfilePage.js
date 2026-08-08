@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-hot-toast';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
-import { updateUserProfile, resetUpdateSuccess } from '../slices/userSlice';
+import { updateUserProfile, resetUpdateSuccess, fetchUserProfile } from '../slices/userSlice';
 
 const profileSchema = Yup.object().shape({
   name: Yup.string().required('Name is required'),
@@ -21,6 +21,11 @@ const profileSchema = Yup.object().shape({
 const ProfilePage = () => {
   const dispatch = useDispatch();
   const { userInfo, loading, error, success } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    dispatch(fetchUserProfile());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (success) {
