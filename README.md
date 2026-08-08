@@ -27,7 +27,7 @@ RM STORE is a premium retail brand specializing in high-quality food products, i
 - **Database**: MongoDB with Mongoose
 - **Authentication**: JWT and bcrypt
 - **Payment Gateways**: Stripe and PayPal
-- **Image Storage**: Cloudinary
+- **Image Handling**: Direct image URLs (pasted links), stored as strings in MongoDB
 
 ## Getting Started
 

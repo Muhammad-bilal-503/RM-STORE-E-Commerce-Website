@@ -1,7 +1,8 @@
 const products = [
   {
     name: 'Organic Whole Wheat Flour',
-    images: [{ url: 'https://via.placeholder.com/300' }],
+    image: 'https://via.placeholder.com/300',
+    images: ['https://via.placeholder.com/300'],
     brand: 'RM STORE',
     category: 'flours',
     description: 'Premium organic whole wheat flour, perfect for baking bread and pastries.',
@@ -35,7 +36,8 @@ const products = [
   },
   {
     name: 'Basmati Rice',
-    images: [{ url: 'https://via.placeholder.com/300' }],
+    image: 'https://via.placeholder.com/300',
+    images: ['https://via.placeholder.com/300'],
     brand: 'RM STORE',
     category: 'rice',
     description: 'Aromatic long-grain basmati rice for perfect biryani and pulao.',
@@ -69,7 +71,8 @@ const products = [
   },
   {
     name: 'Raw Honey',
-    images: [{ url: 'https://via.placeholder.com/300' }],
+    image: 'https://via.placeholder.com/300',
+    images: ['https://via.placeholder.com/300'],
     brand: 'RM STORE',
     category: 'honey',
     description: 'Pure, unfiltered raw honey with all natural benefits.',
@@ -103,7 +106,8 @@ const products = [
   },
   {
     name: 'Mixed Dry Fruits',
-    images: [{ url: 'https://via.placeholder.com/300' }],
+    image: 'https://via.placeholder.com/300',
+    images: ['https://via.placeholder.com/300'],
     brand: 'RM STORE',
     category: 'dryfruits',
     description: 'Premium mix of almonds, cashews, and raisins.',
@@ -137,7 +141,8 @@ const products = [
   },
   {
     name: 'Organic Dates',
-    images: [{ url: 'https://via.placeholder.com/300' }],
+    image: 'https://via.placeholder.com/300',
+    images: ['https://via.placeholder.com/300'],
     brand: 'RM STORE',
     category: 'dates',
     description: 'Sweet and nutritious organic dates, perfect for snacking and desserts.',
@@ -171,7 +176,8 @@ const products = [
   },
   {
     name: 'Premium Spices Set',
-    images: [{ url: 'https://via.placeholder.com/300' }],
+    image: 'https://via.placeholder.com/300',
+    images: ['https://via.placeholder.com/300'],
     brand: 'RM STORE',
     category: 'spices',
     description: 'Collection of premium quality spices for authentic cooking.',

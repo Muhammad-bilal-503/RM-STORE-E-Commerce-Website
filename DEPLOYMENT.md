@@ -8,8 +8,10 @@ This project has three deployable pieces:
 | `frontend/` | Customer store (React) | Azure Static Web Apps |
 | `admin/admin-frontend/` | Admin dashboard (React) | Azure Static Web Apps |
 
-The database (MongoDB Atlas) and image storage (Cloudinary) are external managed
-services — you don't host them on Azure yourself.
+The database (MongoDB Atlas) is the only external managed service — you don't
+host it on Azure yourself. Product/recipe images are handled as plain URL
+strings (paste a direct image link in the admin forms), so no image storage
+service is required.
 
 ---
 
@@ -19,10 +21,9 @@ services — you don't host them on Azure yourself.
    - Create a cluster, a database user, and grab the connection string.
    - Under **Network Access**, add `0.0.0.0/0` (or Azure's outbound IP ranges once
      you know them) so App Service can reach it.
-2. **Cloudinary** account (free tier) — grab your Cloud Name, API Key, API Secret.
-3. **Stripe** account — grab your secret key and publishable key. You'll add the
+2. **Stripe** account — grab your secret key and publishable key. You'll add the
    webhook endpoint once the backend has a public URL (step 3 below).
-4. An **Azure subscription**.
+3. An **Azure subscription**.
 
 ---
 
@@ -50,7 +51,6 @@ services — you don't host them on Azure yourself.
    | `JWT_SECRET` | a long random string |
    | `CLIENT_URL` | your deployed customer-frontend URL (step 2) |
    | `CORS_ORIGINS` | `https://<your-frontend>.azurestaticapps.net,https://<your-admin-frontend>.azurestaticapps.net` |
-   | `CLOUDINARY_CLOUD_NAME` / `CLOUDINARY_API_KEY` / `CLOUDINARY_API_SECRET` | from Cloudinary |
    | `EMAIL_HOST` / `EMAIL_PORT` / `EMAIL_USER` / `EMAIL_PASS` / `EMAIL_FROM` | your SMTP provider |
    | `STRIPE_SECRET_KEY` | from Stripe |
    | `STRIPE_WEBHOOK_SECRET` | from Stripe, once the webhook is created (step below) |
@@ -104,8 +104,8 @@ Repeat for both `frontend/` (customer store) and `admin/admin-frontend/`
 - [ ] Admin login works from the deployed admin frontend (an existing user needs
       `isAdmin: true` — set this directly in Atlas, or run `npm run data:import`
       in `backend/` once with `MONGO_URI` pointed at Atlas to seed a default admin)
-- [ ] Product image upload from the admin panel lands in Cloudinary and the URL
-      renders on the storefront
+- [ ] A product/recipe saved with an image URL in the admin panel renders that
+      image correctly on the storefront
 - [ ] Stripe webhook shows successful deliveries in the Stripe Dashboard
 - [ ] CORS: confirm the browser console shows no CORS errors on either frontend
 

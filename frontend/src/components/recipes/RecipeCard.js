@@ -9,7 +9,7 @@ const RecipeCard = ({ recipe }) => {
       <Link to={`/recipe/${recipe._id}`}>
         <div className="relative h-48 overflow-hidden">
           <img
-            src={recipe.image.url}
+            src={recipe.image}
             alt={recipe.title}
             className="w-full h-full object-cover hover:transform hover:scale-105 transition-transform duration-300"
           />

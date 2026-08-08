@@ -31,8 +31,6 @@ function AddProduct() {
 
   const [successMessage, setSuccessMessage] = useState("")
   const [errorMessage, setErrorMessage] = useState("")
-  const [uploadingMain, setUploadingMain] = useState(false)
-  const [uploadingExtra, setUploadingExtra] = useState(false)
 
   const categories = [
     "flours", "grains", "spices", "oils", "dairy", "vegetables",
@@ -70,43 +68,15 @@ function AddProduct() {
     }
   }
 
-  const uploadImageFile = async (file) => {
-    const formData = new FormData()
-    formData.append("image", file)
-    const { data } = await api.post("/upload", formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    })
-    return data.imageUrl
-  }
+  const [newImageUrl, setNewImageUrl] = useState("")
 
-  const handleMainImageUpload = async (e) => {
-    const file = e.target.files[0]
-    if (!file) return
-    setUploadingMain(true)
-    setErrorMessage("")
-    try {
-      const imageUrl = await uploadImageFile(file)
-      handleInputChange("image", imageUrl)
-    } catch (error) {
-      setErrorMessage(error.response?.data?.message || "Image upload failed.")
-    } finally {
-      setUploadingMain(false)
-    }
-  }
-
-  const handleAdditionalImageUpload = async (e) => {
-    const file = e.target.files[0]
-    if (!file) return
-    setUploadingExtra(true)
-    setErrorMessage("")
-    try {
-      const imageUrl = await uploadImageFile(file)
-      setProductData((prev) => ({ ...prev, images: [...prev.images, imageUrl] }))
-    } catch (error) {
-      setErrorMessage(error.response?.data?.message || "Image upload failed.")
-    } finally {
-      setUploadingExtra(false)
-      e.target.value = ""
+  const addImage = () => {
+    if (newImageUrl.trim()) {
+      setProductData((prev) => ({
+        ...prev,
+        images: [...prev.images, newImageUrl.trim()],
+      }))
+      setNewImageUrl("")
     }
   }
 
@@ -119,7 +89,7 @@ function AddProduct() {
     e.preventDefault()
 
     if (!productData.image) {
-      setErrorMessage("Please upload a main image before submitting.")
+      setErrorMessage("Please provide a main image URL before submitting.")
       return
     }
 
@@ -260,35 +230,37 @@ function AddProduct() {
           </div>
           <div className="card-content">
             <div className="form-group">
-              <label htmlFor="mainImage">Main Image *</label>
+              <label htmlFor="mainImage">Main Image URL *</label>
               <input
                 id="mainImage"
-                type="file"
-                accept="image/png, image/jpeg, image/webp"
-                onChange={handleMainImageUpload}
-                disabled={uploadingMain}
+                value={productData.image}
+                onChange={(e) => handleInputChange("image", e.target.value)}
+                placeholder="https://example.com/image.jpg"
+                required
               />
-              {uploadingMain && <p>Uploading…</p>}
               {productData.image && (
                 <img src={productData.image} alt="Main preview" className="image-preview" />
               )}
             </div>
 
             <div className="form-group">
-              <label htmlFor="additionalImages">Additional Images</label>
-              <input
-                id="additionalImages"
-                type="file"
-                accept="image/png, image/jpeg, image/webp"
-                onChange={handleAdditionalImageUpload}
-                disabled={uploadingExtra}
-              />
-              {uploadingExtra && <p>Uploading…</p>}
+              <label>Additional Images</label>
+              <div className="image-input-group">
+                <input
+                  value={newImageUrl}
+                  onChange={(e) => setNewImageUrl(e.target.value)}
+                  placeholder="https://example.com/image.jpg"
+                />
+                <button type="button" onClick={addImage} className="btn-add">
+                  Add
+                </button>
+              </div>
               {productData.images.length > 0 && (
                 <div className="image-list">
                   {productData.images.map((image, index) => (
                     <div key={index} className="image-item">
                       <img src={image} alt={`Preview ${index + 1}`} className="image-preview" />
+                      <span className="image-url">{image}</span>
                       <button type="button" className="btn-remove" onClick={() => removeImage(index)}>
                         Remove
                       </button>

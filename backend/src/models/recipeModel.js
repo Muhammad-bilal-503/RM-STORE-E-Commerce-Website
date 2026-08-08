@@ -32,14 +32,8 @@ const recipeSchema = mongoose.Schema(
       },
     ],
     image: {
-      url: {
-        type: String,
-        required: true,
-      },
-      publicId: {
-        type: String,
-        required: true,
-      },
+      type: String,
+      required: true,
     },
     preparationTime: {
       type: Number, // in minutes

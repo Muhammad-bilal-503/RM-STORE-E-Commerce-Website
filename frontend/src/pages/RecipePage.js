@@ -54,7 +54,7 @@ const RecipePage = () => {
         {/* Recipe Header */}
         <div className="relative h-96">
           <img
-            src={recipe.image?.url || recipe.image}
+            src={recipe.image}
             alt={recipe.title || recipe.name}
             className="w-45 h-full object-cover"
           />

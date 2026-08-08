@@ -10,10 +10,7 @@ function AddRecipe() {
     description: "",
     ingredients: [{ name: "", quantity: "" }],
     steps: [""],
-    image: {
-      url: "",
-      publicId: "",
-    },
+    image: "",
     preparationTime: 0,
     cookingTime: 0,
     servings: 1,
@@ -31,7 +28,6 @@ function AddRecipe() {
 
   const [newTag, setNewTag] = useState("")
   const [newStep, setNewStep] = useState("")
-  const [uploadingImage, setUploadingImage] = useState(false)
   const [errorMessage, setErrorMessage] = useState("")
   const [successMessage, setSuccessMessage] = useState("")
 
@@ -70,28 +66,9 @@ function AddRecipe() {
     }))
   }
 
-  // Upload the recipe image to Cloudinary
-  const handleImageUpload = async (e) => {
-    const file = e.target.files[0]
-    if (!file) return
-
-    setUploadingImage(true)
-    setErrorMessage("")
-    try {
-      const formData = new FormData()
-      formData.append("image", file)
-      const { data } = await api.post("/upload", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      })
-      setRecipeData((prev) => ({
-        ...prev,
-        image: { url: data.imageUrl, publicId: data.publicId },
-      }))
-    } catch (error) {
-      setErrorMessage(error.response?.data?.message || "Image upload failed.")
-    } finally {
-      setUploadingImage(false)
-    }
+  // Set the recipe image directly from a pasted URL
+  const handleImageChange = (value) => {
+    setRecipeData((prev) => ({ ...prev, image: value }))
   }
 
   // Handle ingredient changes
@@ -180,7 +157,7 @@ function AddRecipe() {
  const handleSubmit = async (e) => {
   e.preventDefault();
 
-  if (!recipeData.image.url) {
+  if (!recipeData.image) {
     setErrorMessage("Please upload a recipe image before submitting.");
     return;
   }
@@ -312,19 +289,18 @@ function AddRecipe() {
           </div>
           <div className="card-content">
             <div className="form-group">
-              <label htmlFor="imageUpload">Image *</label>
+              <label htmlFor="imageUrl">Image URL *</label>
               <input
-                id="imageUpload"
-                type="file"
-                accept="image/png, image/jpeg, image/webp"
-                onChange={handleImageUpload}
-                disabled={uploadingImage}
+                id="imageUrl"
+                value={recipeData.image}
+                onChange={(e) => handleImageChange(e.target.value)}
+                placeholder="https://example.com/image.jpg"
+                required
               />
-              {uploadingImage && <p>Uploading…</p>}
             </div>
-            {recipeData.image.url && (
+            {recipeData.image && (
               <div className="image-preview">
-                <img src={recipeData.image.url} alt="Recipe preview" />
+                <img src={recipeData.image} alt="Recipe preview" />
               </div>
             )}
           </div>

@@ -29,7 +29,6 @@ We've created a MERN stack e-commerce website for RM STORE, a premium retail bra
 - Product routes for browsing, searching, and reviewing products
 - Order routes for order creation, payment, and tracking
 - Recipe routes for browsing and viewing recipes
-- Upload routes for Cloudinary image management
 - Payment routes for Stripe payment processing
 
 ## Frontend Implementation

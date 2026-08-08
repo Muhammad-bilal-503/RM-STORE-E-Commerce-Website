@@ -64,7 +64,6 @@ const getRecipeById = asyncHandler(async (req, res) => {
 // @route   POST /api/recipes
 // @access  Private/Admin
 const addRecipe = async (req, res) => {
-  console.log("i am call");
   try {
     const {
       title,
@@ -81,15 +80,14 @@ const addRecipe = async (req, res) => {
       nutritionalInfo,
       isFeatured,
     } = req.body;
-      console.log(req.body);
+
     // Basic validation (you can enhance this)
     if (
       !title ||
       !description ||
       !ingredients?.length ||
       !steps?.length ||
-      !image?.url ||
-      !image?.publicId ||
+      !image ||
       !preparationTime ||
       !cookingTime ||
       !servings ||

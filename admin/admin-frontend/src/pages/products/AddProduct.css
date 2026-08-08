@@ -193,6 +193,14 @@ textarea {
   border: 1px solid #e2e8f0;
 }
 
+.image-url {
+  font-size: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+
 /* Nutrition grid */
 .nutrition-grid {
   display: grid;

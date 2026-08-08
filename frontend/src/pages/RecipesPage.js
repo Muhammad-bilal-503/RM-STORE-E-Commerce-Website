@@ -94,7 +94,7 @@ const RecipesPage = () => {
               <Link to={`/recipe/${recipe._id}`}>
                 <div className="relative pb-[60%]">
                   <img
-                    src={recipe.image?.url}
+                    src={recipe.image}
                     alt={recipe.title}
                     className="absolute inset-0 w-full h-full object-cover"
                   />
