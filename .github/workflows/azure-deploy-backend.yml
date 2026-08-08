@@ -1,0 +1,39 @@
+name: Deploy Backend to Azure App Service
+
+# Triggers on pushes to main that touch the backend folder.
+# Requires a repository secret named AZURE_WEBAPP_PUBLISH_PROFILE
+# (download it from the App Service's "Get publish profile" button in the Azure Portal)
+# and AZURE_WEBAPP_NAME set below to your App Service name.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'backend/**'
+  workflow_dispatch:
+
+env:
+  AZURE_WEBAPP_NAME: rm-store-backend # <-- change to your App Service name
+  NODE_VERSION: '18.x'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install dependencies
+        working-directory: ./backend
+        run: npm ci --omit=dev
+
+      - name: Deploy to Azure App Service
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: ./backend
