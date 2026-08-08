@@ -1,16 +1,15 @@
 {
   "name": "rm-store",
   "version": "1.0.0",
-  "description": "RM STORE E-commerce Website",
-  "main": "index.js",
+  "description": "RM STORE E-commerce Website (monorepo dev convenience scripts — see DEPLOYMENT.md for Azure)",
+  "private": true,
   "scripts": {
-    "start": "node backend/src/server.js",
-    "server": "nodemon backend/src/server.js",
+    "server": "npm run dev --prefix backend",
     "client": "npm start --prefix frontend",
+    "admin": "npm start --prefix admin/admin-frontend",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "install-deps": "npm install && npm install --prefix frontend && npm install --prefix backend",
-    "build": "npm run build --prefix frontend",
-    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix frontend && npm install --prefix backend && npm run build --prefix frontend"
+    "install-deps": "npm install --prefix backend && npm install --prefix frontend && npm install --prefix admin/admin-frontend",
+    "build": "npm run build --prefix frontend"
   },
   "keywords": [
     "ecommerce",
@@ -19,15 +18,8 @@
   ],
   "author": "RM STORE",
   "license": "ISC",
-  "dependencies": {
-    "axios": "^1.9.0",
-    "bootstrap": "^5.3.6",
-    "canvas-confetti": "^1.9.3",
-    "concurrently": "^8.0.1",
-    "date-fns": "^4.1.0",
-    "react-bootstrap": "^2.10.10"
-  },
   "devDependencies": {
-    "nodemon": "^2.0.22"
+    "concurrently": "^8.0.1"
   }
 }
+

@@ -15,10 +15,6 @@ dist/
 **/build/
 **/dist/
 
-# Uploaded files (local dev only — production uses Cloudinary)
-backend/uploads/*
-!backend/uploads/.gitkeep
-
 # Logs
 npm-debug.log*
 yarn-debug.log*

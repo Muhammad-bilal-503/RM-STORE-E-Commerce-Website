@@ -92,11 +92,15 @@ exports.createProduct = async (req, res) => {
     }
 
     // Create new product with data from the form
+    if (!image) {
+      return res.status(400).json({ message: 'Product image is required' });
+    }
+
     const product = new Product({
       name,
       price: price || (variants && variants.length > 0 ? variants[0].price : 0),
       user: req.user._id,
-      image: image || '/uploads/sample.jpg',
+      image,
       images: images || [],
       brand,
       category,
