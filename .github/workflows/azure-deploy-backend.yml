@@ -2,6 +2,7 @@ name: Deploy Backend to Azure App Service
 
 # Triggers on pushes to main that touch the backend folder.
 # Requires a repository secret named AZURE_WEBAPP_PUBLISH_PROFILE
+# (or AZUREAPPSERVICE_PUBLISHPROFILE, the default name used by Azure's workflow generator)
 # (download it from the App Service's "Get publish profile" button in the Azure Portal)
 # and AZURE_WEBAPP_NAME set below to your App Service name.
 
@@ -35,5 +36,5 @@ jobs:
         uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
-          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE || secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
           package: ./backend
