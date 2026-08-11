@@ -1,10 +1,14 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useParams, useNavigate } from "react-router-dom"
 import "./AddProduct.css"
 import api from "../../services/api"
 
 function AddProduct() {
+  const { id } = useParams()
+  const navigate = useNavigate()
+  const isEditMode = Boolean(id)
   const [productData, setProductData] = useState({
     name: "",
     image: "",
@@ -32,6 +36,7 @@ function AddProduct() {
   const [successMessage, setSuccessMessage] = useState("")
   const [errorMessage, setErrorMessage] = useState("")
   const [categories, setCategories] = useState([])
+  const [loadingProduct, setLoadingProduct] = useState(isEditMode)
 
   useEffect(() => {
     api
@@ -39,6 +44,42 @@ function AddProduct() {
       .then(({ data }) => setCategories(data))
       .catch(() => setCategories([]))
   }, [])
+
+  useEffect(() => {
+    if (!isEditMode) return
+
+    api
+      .get(`/products/${id}`)
+      .then(({ data }) => {
+        setProductData({
+          name: data.name || "",
+          image: data.image || "",
+          images: data.images || [],
+          brand: data.brand || "",
+          category: data.category || "",
+          description: data.description || "",
+          rating: data.rating || 0,
+          numReviews: data.numReviews || 0,
+          variants: data.variants?.length
+            ? data.variants
+            : [{ name: "", size: "", price: 0, countInStock: 0 }],
+          isOrganic: data.isOrganic || false,
+          isFeatured: data.isFeatured || false,
+          discount: data.discount || 0,
+          weight: data.weight || "",
+          ingredients: data.ingredients || "",
+          nutritionFacts: {
+            calories: data.nutritionFacts?.calories || 0,
+            protein: data.nutritionFacts?.protein || 0,
+            carbohydrates: data.nutritionFacts?.carbohydrates || 0,
+            fat: data.nutritionFacts?.fat || 0,
+          },
+          price: data.price || "",
+        })
+      })
+      .catch(() => setErrorMessage("Failed to load product for editing."))
+      .finally(() => setLoadingProduct(false))
+  }, [id, isEditMode])
 
   const handleInputChange = (field, value) => {
     setProductData((prev) => ({ ...prev, [field]: value }))
@@ -97,6 +138,14 @@ function AddProduct() {
     }
 
     try {
+      if (isEditMode) {
+        await api.put(`/products/${id}`, productData)
+        setSuccessMessage("Product updated successfully!")
+        setErrorMessage("")
+        setTimeout(() => navigate("/products"), 1000)
+        return
+      }
+
       await api.post("/products", productData)
 
       setSuccessMessage("Product added successfully!")
@@ -127,16 +176,20 @@ function AddProduct() {
         price: "",
       })
     } catch (error) {
-      setErrorMessage(error.response?.data?.message || "Failed to add product.")
+      setErrorMessage(error.response?.data?.message || `Failed to ${isEditMode ? "update" : "add"} product.`)
       setSuccessMessage("")
     }
+  }
+
+  if (loadingProduct) {
+    return <div className="add-product-container"><p>Loading product...</p></div>
   }
 
   return (
     <div className="add-product-container">
       <div className="add-product-header">
-        <h1>Add New Product</h1>
-        <p>Fill in the details to add a new product to your store</p>
+        <h1>{isEditMode ? "Edit Product" : "Add New Product"}</h1>
+        <p>{isEditMode ? "Update this product's details" : "Fill in the details to add a new product to your store"}</p>
       </div>
 
       {/* Success/Error Messages */}
@@ -476,11 +529,11 @@ function AddProduct() {
 
         {/* Submit Button */}
         <div className="form-actions">
-          <button type="button" className="btn-cancel">
+          <button type="button" className="btn-cancel" onClick={() => navigate("/products")}>
             Cancel
           </button>
           <button type="submit" className="btn-submit">
-            Add Product
+            {isEditMode ? "Update Product" : "Add Product"}
           </button>
         </div>
       </form>
