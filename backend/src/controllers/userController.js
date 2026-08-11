@@ -88,6 +88,11 @@ const getUserProfile = asyncHandler(async (req, res) => {
       email: user.email,
       isAdmin: user.isAdmin,
       isVerified: user.isVerified,
+      phone: user.phone,
+      address: user.address,
+      wishlistCount: user.wishlist.length,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
     });
   } else {
     res.status(404);
@@ -105,6 +110,20 @@ const updateUserProfile = asyncHandler(async (req, res) => {
     user.name = req.body.name || user.name;
     user.email = req.body.email || user.email;
 
+    if (req.body.phone !== undefined) {
+      user.phone = req.body.phone;
+    }
+
+    if (req.body.address) {
+      user.address = {
+        street: req.body.address.street ?? user.address.street,
+        city: req.body.address.city ?? user.address.city,
+        state: req.body.address.state ?? user.address.state,
+        postalCode: req.body.address.postalCode ?? user.address.postalCode,
+        country: req.body.address.country ?? user.address.country,
+      };
+    }
+
     if (req.body.password) {
       user.password = req.body.password;
     }
@@ -117,6 +136,11 @@ const updateUserProfile = asyncHandler(async (req, res) => {
       email: updatedUser.email,
       isAdmin: updatedUser.isAdmin,
       isVerified: updatedUser.isVerified,
+      phone: updatedUser.phone,
+      address: updatedUser.address,
+      wishlistCount: updatedUser.wishlist.length,
+      createdAt: updatedUser.createdAt,
+      updatedAt: updatedUser.updatedAt,
       token: generateToken(updatedUser._id),
     });
   } else {

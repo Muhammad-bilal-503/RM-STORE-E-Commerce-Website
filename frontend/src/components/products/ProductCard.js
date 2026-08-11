@@ -182,7 +182,7 @@ const ProductCard = ({ product, viewMode = 'grid' }) => {
   // Grid view (default)
   return (
     <motion.div 
-      className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 border border-gray-100 group"
+      className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 border border-gray-100 group h-full flex flex-col"
       whileHover={{ y: -8 }}
       layout
     >
@@ -219,7 +219,7 @@ const ProductCard = ({ product, viewMode = 'grid' }) => {
         </button>
         
         <Link to={`/product/${product._id}`}>
-          <div className="h-64 overflow-hidden">
+          <div className="aspect-square overflow-hidden bg-gray-50">
             <img
               src={productImage}
               alt={product.name}
@@ -230,9 +230,9 @@ const ProductCard = ({ product, viewMode = 'grid' }) => {
       </div>
       
       {/* Product Info */}
-      <div className="p-6">
+      <div className="p-6 flex flex-col flex-1">
         <Link to={`/product/${product._id}`}>
-          <h3 className="text-lg font-bold mb-2 hover:text-green-700 transition-colors duration-200 line-clamp-2">
+          <h3 className="text-lg font-bold mb-2 hover:text-green-700 transition-colors duration-200 line-clamp-2 min-h-[3.5rem]">
             {product.name}
           </h3>
         </Link>
@@ -243,13 +243,13 @@ const ProductCard = ({ product, viewMode = 'grid' }) => {
         
         {/* Category */}
         <div className="mb-3">
-          <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs">
+          <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs capitalize">
             {product.category}
           </span>
         </div>
         
         {/* Price */}
-        <div className="mb-4">
+        <div className="mb-4 mt-auto">
           <div className="flex items-center gap-2">
             {discountPrice ? (
               <>
