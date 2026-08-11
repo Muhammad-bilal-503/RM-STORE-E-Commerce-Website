@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import api from '../../services/api';
+import { formatCurrency } from '../../utils/formatCurrency';
 
 function ProductsPage() {
   const navigate = useNavigate();
@@ -218,7 +219,7 @@ function ProductsPage() {
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        Rs. {product.price.toLocaleString()}
+                        {formatCurrency(product.price)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         {product.stock || product.variants?.reduce((total, v) => total + v.countInStock, 0) || 0}

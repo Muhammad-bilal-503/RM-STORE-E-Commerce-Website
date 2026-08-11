@@ -12,6 +12,7 @@ import {
 } from 'react-icons/fa';
 import { toast } from 'react-hot-toast';
 import Loader from '../components/ui/Loader';
+import { formatCurrency } from '../utils/formatCurrency';
 import axiosInstance from '../utils/axios';
 
 const OrderPage = () => {
@@ -273,8 +274,8 @@ const OrderPage = () => {
                       <p className="text-sm text-gray-600">Quantity: {item.qty}</p>
                     </div>
                     <div className="text-right">
-                      <p className="font-semibold text-gray-900">₹{(item.price * item.qty).toFixed(2)}</p>
-                      <p className="text-sm text-gray-600">₹{item.price}/each</p>
+                      <p className="font-semibold text-gray-900">{formatCurrency(item.price * item.qty)}</p>
+                      <p className="text-sm text-gray-600">{formatCurrency(item.price)}/each</p>
                     </div>
                   </div>
                 ))}
@@ -296,20 +297,20 @@ const OrderPage = () => {
               <div className="space-y-3">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Items:</span>
-                  <span className="font-medium">₹{order.itemsPrice.toFixed(2)}</span>
+                  <span className="font-medium">{formatCurrency(order.itemsPrice)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Shipping:</span>
-                  <span className="font-medium">₹{order.shippingPrice.toFixed(2)}</span>
+                  <span className="font-medium">{formatCurrency(order.shippingPrice)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Tax:</span>
-                  <span className="font-medium">₹{order.taxPrice.toFixed(2)}</span>
+                  <span className="font-medium">{formatCurrency(order.taxPrice)}</span>
                 </div>
                 <hr className="border-gray-200" />
                 <div className="flex justify-between">
                   <span className="text-lg font-bold text-gray-900">Total:</span>
-                  <span className="text-lg font-bold text-green-600">₹{order.totalPrice.toFixed(2)}</span>
+                  <span className="text-lg font-bold text-green-600">{formatCurrency(order.totalPrice)}</span>
                 </div>
               </div>
 

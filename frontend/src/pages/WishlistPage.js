@@ -6,6 +6,7 @@ import { FaHeart, FaShoppingCart, FaTrash, FaEye } from 'react-icons/fa';
 import { toast } from 'react-hot-toast';
 import { addToCart } from '../slices/cartSlice';
 import axiosInstance from '../utils/axios';
+import { formatCurrency } from '../utils/formatCurrency';
 
 const WishlistPage = () => {
   const dispatch = useDispatch();
@@ -189,7 +190,7 @@ const WishlistPage = () => {
                 {/* Price */}
                 <div className="flex items-center justify-between mb-4">
                   <span className="text-2xl font-bold text-green-600">
-                    ₹{item.price}
+                    {formatCurrency(item.price)}
                   </span>
                 </div>
 

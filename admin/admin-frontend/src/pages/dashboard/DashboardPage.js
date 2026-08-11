@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../services/api';
+import { formatCurrency } from '../../utils/formatCurrency';
 
 function DashboardPage() {
   const navigate = useNavigate();
@@ -49,7 +50,7 @@ function DashboardPage() {
   const statCards = [
     {
       title: 'Total Revenue',
-      value: `$${stats.totalRevenue.toLocaleString()}`,
+      value: formatCurrency(stats.totalRevenue),
       icon: (
         <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
@@ -228,7 +229,7 @@ function DashboardPage() {
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="font-semibold text-gray-900">${product.revenue}</p>
+                  <p className="font-semibold text-gray-900">{formatCurrency(product.revenue)}</p>
                   <p className="text-sm text-gray-500">Revenue</p>
                 </div>
               </div>

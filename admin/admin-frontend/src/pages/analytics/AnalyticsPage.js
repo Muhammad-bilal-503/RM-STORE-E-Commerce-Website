@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import api from '../../services/api';
+import { formatCurrency } from '../../utils/formatCurrency';
 
 function AnalyticsPage() {
   const [dashboard, setDashboard] = useState(null);
@@ -47,7 +48,7 @@ function AnalyticsPage() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="bg-white rounded-lg shadow p-4">
           <p className="text-sm text-gray-500">Total Revenue</p>
-          <p className="text-2xl font-bold text-gray-900">${dashboard.totalRevenue.toLocaleString()}</p>
+          <p className="text-2xl font-bold text-gray-900">{formatCurrency(dashboard.totalRevenue)}</p>
         </div>
         <div className="bg-white rounded-lg shadow p-4">
           <p className="text-sm text-gray-500">Total Orders</p>
@@ -73,7 +74,7 @@ function AnalyticsPage() {
               <div key={cat.category}>
                 <div className="flex justify-between text-sm mb-1">
                   <span className="capitalize font-medium text-gray-700">{cat.category}</span>
-                  <span className="text-gray-500">${cat.sales.toFixed(2)} ({cat.orders} orders)</span>
+                  <span className="text-gray-500">{formatCurrency(cat.sales)} ({cat.orders} orders)</span>
                 </div>
                 <div className="w-full bg-gray-100 rounded-full h-2">
                   <div
@@ -105,7 +106,7 @@ function AnalyticsPage() {
                 <tr key={p._id}>
                   <td className="px-2 py-2 text-sm text-gray-900">{p.name}</td>
                   <td className="px-2 py-2 text-sm text-gray-500">{p.sales}</td>
-                  <td className="px-2 py-2 text-sm font-medium text-gray-900">${p.revenue.toFixed(2)}</td>
+                  <td className="px-2 py-2 text-sm font-medium text-gray-900">{formatCurrency(p.revenue)}</td>
                 </tr>
               ))}
             </tbody>

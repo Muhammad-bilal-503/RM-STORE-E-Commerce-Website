@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { removeFromCart, updateCartItemQuantity, initializePrices } from '../slices/cartSlice';
 import { toast } from 'react-hot-toast';
+import { formatCurrency } from '../utils/formatCurrency';
 
 const CartPage = () => {
   const navigate = useNavigate();
@@ -124,7 +125,7 @@ const CartPage = () => {
                               {item.variantName}
                             </span>
                           )}
-                          <span className="font-semibold text-lg">Rs. {item.price.toLocaleString()}</span>
+                          <span className="font-semibold text-lg">{formatCurrency(item.price)}</span>
                         </p>
                         {item.inStock === false && (
                           <p className="text-red-600 text-sm mt-1">⚠️ Out of Stock</p>
@@ -171,7 +172,7 @@ const CartPage = () => {
                         {/* Item Total */}
                         <div className="text-right">
                           <p className="font-semibold text-gray-900">
-                            Rs. {(item.price * item.qty).toLocaleString()}
+                            {formatCurrency(item.price * item.qty)}
                           </p>
                         </div>
                       </div>
@@ -203,7 +204,7 @@ const CartPage = () => {
               <div className="space-y-4">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Subtotal ({cartItems.reduce((acc, item) => acc + item.qty, 0)} items)</span>
-                  <span className="font-medium">Rs. {itemsPrice.toLocaleString()}</span>
+                  <span className="font-medium">{formatCurrency(itemsPrice)}</span>
                 </div>
                 
                 <div className="flex justify-between">
@@ -212,26 +213,26 @@ const CartPage = () => {
                     {shippingPrice === 0 ? (
                       <span className="text-green-600">Free</span>
                     ) : (
-                      `Rs. ${shippingPrice.toLocaleString()}`
+                      formatCurrency(shippingPrice)
                     )}
                   </span>
                 </div>
                 
                 <div className="flex justify-between">
                   <span className="text-gray-600">Tax</span>
-                  <span className="font-medium">Rs. {taxPrice.toLocaleString()}</span>
+                  <span className="font-medium">{formatCurrency(taxPrice)}</span>
                 </div>
                 
                 {shippingPrice === 0 && itemsPrice < 100 && (
                   <div className="text-sm text-green-600 bg-green-50 p-3 rounded-lg">
-                    🎉 Add Rs. {(100 - itemsPrice).toFixed(2)} more for free shipping!
+                    🎉 Add {formatCurrency(100 - itemsPrice)} more for free shipping!
                   </div>
                 )}
                 
                 <div className="border-t border-gray-200 pt-4">
                   <div className="flex justify-between">
                     <span className="text-lg font-semibold text-gray-900">Total</span>
-                    <span className="text-lg font-bold text-gray-900">Rs. {totalPrice.toLocaleString()}</span>
+                    <span className="text-lg font-bold text-gray-900">{formatCurrency(totalPrice)}</span>
                   </div>
                 </div>
               </div>

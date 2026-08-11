@@ -6,6 +6,7 @@ import { FaHeart, FaRegHeart, FaShoppingCart } from 'react-icons/fa';
 import Rating from '../ui/Rating';
 import { addToCart } from '../../slices/cartSlice';
 import toast from 'react-hot-toast';
+import { formatCurrency } from '../../utils/formatCurrency';
 
 const ProductCard = ({ product, viewMode = 'grid' }) => {
   const dispatch = useDispatch();
@@ -133,11 +134,11 @@ const ProductCard = ({ product, viewMode = 'grid' }) => {
                 <div className="flex items-center gap-2">
                   {discountPrice ? (
                     <>
-                      <span className="text-2xl font-bold text-green-700">₹{discountPrice.toFixed(2)}</span>
-                      <span className="text-lg text-gray-500 line-through">₹{price.toFixed(2)}</span>
+                      <span className="text-2xl font-bold text-green-700">{formatCurrency(discountPrice)}</span>
+                      <span className="text-lg text-gray-500 line-through">{formatCurrency(price)}</span>
                     </>
                   ) : (
-                    <span className="text-2xl font-bold text-green-700">₹{price.toFixed(2)}</span>
+                    <span className="text-2xl font-bold text-green-700">{formatCurrency(price)}</span>
                   )}
                 </div>
                 {defaultVariant?.size && (
@@ -252,11 +253,11 @@ const ProductCard = ({ product, viewMode = 'grid' }) => {
           <div className="flex items-center gap-2">
             {discountPrice ? (
               <>
-                <span className="text-xl font-bold text-green-700">₹{discountPrice.toFixed(2)}</span>
-                <span className="text-sm text-gray-500 line-through">₹{price.toFixed(2)}</span>
+                <span className="text-xl font-bold text-green-700">{formatCurrency(discountPrice)}</span>
+                <span className="text-sm text-gray-500 line-through">{formatCurrency(price)}</span>
               </>
             ) : (
-              <span className="text-xl font-bold text-green-700">₹{price.toFixed(2)}</span>
+              <span className="text-xl font-bold text-green-700">{formatCurrency(price)}</span>
             )}
           </div>
           {defaultVariant?.size && (

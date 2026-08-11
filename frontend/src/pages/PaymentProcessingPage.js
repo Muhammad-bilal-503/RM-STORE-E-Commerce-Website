@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { FaCreditCard, FaSpinner, FaCheckCircle, FaTimes } from 'react-icons/fa';
 import axiosInstance from '../utils/axios';
 import { toast } from 'react-hot-toast';
+import { formatCurrency } from '../utils/formatCurrency';
 
 const PaymentProcessingPage = () => {
   const { orderId } = useParams();
@@ -217,7 +218,7 @@ const PaymentProcessingPage = () => {
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Amount:</span>
-                <span className="font-medium">₹{order.totalPrice.toFixed(2)}</span>
+                <span className="font-medium">{formatCurrency(order.totalPrice)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Items:</span>
@@ -245,7 +246,7 @@ const PaymentProcessingPage = () => {
                     Processing...
                   </span>
                 ) : (
-                  `Pay ₹${order.totalPrice.toFixed(2)}`
+                  `Pay ${formatCurrency(order.totalPrice)}`
                 )}
               </button>
             )}

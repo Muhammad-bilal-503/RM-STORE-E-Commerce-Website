@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { toast } from 'react-hot-toast';
 import api from '../../services/api';
+import { formatCurrency } from '../../utils/formatCurrency';
 
 const STATUS_OPTIONS = ['Processing', 'Shipped', 'Delivered', 'Cancelled'];
 
@@ -105,7 +106,7 @@ function OrdersPage() {
                       {new Date(order.createdAt).toLocaleDateString()}
                     </td>
                     <td className="px-4 py-3 text-sm font-medium text-gray-900">
-                      ${order.totalPrice?.toFixed(2)}
+                      {formatCurrency(order.totalPrice)}
                     </td>
                     <td className="px-4 py-3 text-sm">
                       {order.isPaid ? (
