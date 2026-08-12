@@ -93,6 +93,7 @@ function AnalyticsPage() {
         {dashboard.topProducts.length === 0 ? (
           <p className="text-gray-500 text-sm">No sales recorded yet.</p>
         ) : (
+          <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead>
               <tr>
@@ -111,6 +112,7 @@ function AnalyticsPage() {
               ))}
             </tbody>
           </table>
+          </div>
         )}
       </div>
     </div>
