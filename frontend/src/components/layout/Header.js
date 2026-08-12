@@ -89,37 +89,38 @@ const Header = () => {
           </nav>
 
           {/* Search Form */}
-          <form onSubmit={handleSearch} className="hidden md:flex items-center">
+          <form onSubmit={handleSearch} className="hidden md:flex items-center relative">
             <input
               type="text"
               placeholder="Search products..."
-              className="border border-gray-300 rounded-l-md py-2 px-3 focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500"
+              className="w-56 lg:w-72 border border-gray-300 rounded-full py-2 pl-4 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
             <button
               type="submit"
-              className="bg-green-600 text-white py-2 px-4 rounded-r-md hover:bg-green-700 transition duration-300"
+              aria-label="Search"
+              className="absolute right-1 text-gray-500 hover:text-green-600 hover:bg-green-50 rounded-full p-2 transition-colors duration-200"
             >
-              <FaSearch />
+              <FaSearch size={14} />
             </button>
           </form>
 
           {/* User Actions */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-1">
             <Link
               to="/wishlist"
-              className="text-gray-700 hover:text-green-600 transition duration-300"
+              className="text-gray-600 hover:text-red-500 hover:bg-red-50 rounded-full p-2.5 transition-colors duration-200"
             >
-              <FaHeart size={20} />
+              <FaHeart size={18} />
             </Link>
             <Link
               to="/cart"
-              className="text-gray-700 hover:text-green-600 transition duration-300 relative"
+              className="text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-full p-2.5 transition-colors duration-200 relative"
             >
-              <FaShoppingCart size={20} />
+              <FaShoppingCart size={18} />
               {cartItems.length > 0 && (
-                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                <span className="absolute top-0 right-0 bg-red-500 text-white text-xs font-semibold rounded-full h-5 w-5 flex items-center justify-center">
                   {cartItems.length}
                 </span>
               )}
@@ -128,9 +129,9 @@ const Header = () => {
               <div className="relative" ref={profileMenuRef}>
                 <button
                   onClick={() => setIsProfileMenuOpen((prev) => !prev)}
-                  className="text-gray-700 hover:text-green-600 transition duration-300"
+                  className="text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-full p-2.5 transition-colors duration-200"
                 >
-                  <FaUser size={20} />
+                  <FaUser size={18} />
                 </button>
                 {isProfileMenuOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-30">
@@ -161,16 +162,16 @@ const Header = () => {
             ) : (
               <Link
                 to="/login"
-                className="text-gray-700 hover:text-green-600 transition duration-300"
+                className="text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-full p-2.5 transition-colors duration-200"
               >
-                <FaUser size={20} />
+                <FaUser size={18} />
               </Link>
             )}
             <button
               onClick={toggleMenu}
-              className="md:hidden text-gray-700 hover:text-green-600 transition duration-300"
+              className="md:hidden text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-full p-2.5 transition-colors duration-200"
             >
-              {isMenuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
+              {isMenuOpen ? <FaTimes size={22} /> : <FaBars size={22} />}
             </button>
           </div>
         </div>

@@ -1,15 +1,16 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axiosInstance from '../utils/axios';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FaSearch, FaFilter, FaTh, FaList } from 'react-icons/fa';
 import ProductCard from '../components/products/ProductCard';
 
 const ProductsPage = () => {
   const { category } = useParams();
+  const [searchParams] = useSearchParams();
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
-  const [keyword, setKeyword] = useState('');
+  const [keyword, setKeyword] = useState(searchParams.get('keyword') || '');
   const [selectedCategory, setSelectedCategory] = useState(category || 'all');
   const [sortBy, setSortBy] = useState('newest');
   const [viewMode, setViewMode] = useState('grid');
@@ -36,6 +37,13 @@ const ProductsPage = () => {
       setSelectedCategory(category);
     }
   }, [category]);
+
+  useEffect(() => {
+    const urlKeyword = searchParams.get('keyword');
+    if (urlKeyword !== null) {
+      setKeyword(urlKeyword);
+    }
+  }, [searchParams]);
 
   const fetchProducts = async () => {
     try {
