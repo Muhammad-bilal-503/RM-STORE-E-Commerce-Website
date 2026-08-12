@@ -267,3 +267,41 @@ exports.getProductCategories = async (req, res) => {
   }
 };
 
+// @desc    Get categories with product counts (for admin category management)
+// @route   GET /api/products/categories/stats
+// @access  Private/Admin
+exports.getCategoryStats = async (req, res) => {
+  try {
+    const stats = await Product.aggregate([
+      { $match: { category: { $ne: null } } },
+      { $group: { _id: '$category', count: { $sum: 1 } } },
+      { $sort: { _id: 1 } },
+    ]);
+    res.json(stats.map((s) => ({ name: s._id, count: s.count })));
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Rename a category across every product that uses it
+// @route   PUT /api/products/categories/rename
+// @access  Private/Admin
+exports.renameCategory = async (req, res) => {
+  try {
+    const { oldName, newName } = req.body;
+
+    if (!oldName || !newName) {
+      return res.status(400).json({ message: 'oldName and newName are required' });
+    }
+
+    const result = await Product.updateMany(
+      { category: oldName },
+      { $set: { category: newName } }
+    );
+
+    res.json({ message: 'Category renamed', matched: result.matchedCount, modified: result.modifiedCount });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+

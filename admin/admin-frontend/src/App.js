@@ -18,6 +18,7 @@ import AddRecipe from './pages/recipe/AddRecipe';
 import InventoryPage from './pages/inventory/InventoryPage';
 import AnalyticsPage from './pages/analytics/AnalyticsPage';
 import UsersPage from './pages/users/UsersPage';
+import CategoriesPage from './pages/categories/CategoriesPage';
 import ProfilePage from './pages/profile/ProfilePage';
 
 function App() {
@@ -90,6 +91,7 @@ function App() {
             <Route path="inventory" element={<InventoryPage />} />
             <Route path="analytics" element={<AnalyticsPage />} />
             <Route path="users" element={<UsersPage />} />
+            <Route path="categories" element={<CategoriesPage />} />
             <Route path="profile" element={<ProfilePage />} />
           </Route>
 

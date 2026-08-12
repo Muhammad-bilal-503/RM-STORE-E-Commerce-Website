@@ -292,11 +292,18 @@ const ProductsPage = () => {
 
             {/* Products Grid/List */}
             {loading ? (
-              <div className="flex justify-center items-center py-20">
-                <div className="text-center">
-                  <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-green-600 mx-auto mb-4"></div>
-                  <p className="text-gray-600">Loading products...</p>
-                </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                {[...Array(6)].map((_, i) => (
+                  <div key={i} className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 animate-pulse">
+                    <div className="aspect-square bg-gray-200" />
+                    <div className="p-6 space-y-3">
+                      <div className="h-5 bg-gray-200 rounded w-3/4" />
+                      <div className="h-4 bg-gray-200 rounded w-1/2" />
+                      <div className="h-6 bg-gray-200 rounded w-1/3" />
+                      <div className="h-10 bg-gray-200 rounded-xl w-full mt-4" />
+                    </div>
+                  </div>
+                ))}
               </div>
             ) : error ? (
               <motion.div

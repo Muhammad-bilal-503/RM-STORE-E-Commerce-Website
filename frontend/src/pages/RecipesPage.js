@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import Loader from '../components/ui/Loader';
 import Message from '../components/ui/Message';
 import axiosInstance from '../utils/axios';
 
@@ -80,7 +79,19 @@ const RecipesPage = () => {
 
       {/* Recipes Grid */}
       {loading ? (
-        <Loader />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 animate-pulse">
+              <div className="aspect-[4/3] bg-gray-200" />
+              <div className="p-4 space-y-3">
+                <div className="h-4 bg-gray-200 rounded w-1/3" />
+                <div className="h-5 bg-gray-200 rounded w-3/4" />
+                <div className="h-4 bg-gray-200 rounded w-full" />
+                <div className="h-4 bg-gray-200 rounded w-2/3" />
+              </div>
+            </div>
+          ))}
+        </div>
       ) : error ? (
         <Message variant="danger">{error}</Message>
       ) : filteredRecipes.length === 0 ? (

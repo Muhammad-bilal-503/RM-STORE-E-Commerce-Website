@@ -12,6 +12,8 @@ const {
   getProductsByCategory,
   getRelatedProducts,
   getProductCategories,
+  getCategoryStats,
+  renameCategory,
 } = require('../controllers/productController');
 const { protect, admin } = require('../middlewares/authMiddleware');
 
@@ -19,6 +21,8 @@ const { protect, admin } = require('../middlewares/authMiddleware');
 router.get('/top', getTopProducts);
 router.get('/featured', getFeaturedProducts);
 router.get('/categories', getProductCategories);
+router.get('/categories/stats', protect, admin, getCategoryStats);
+router.put('/categories/rename', protect, admin, renameCategory);
 router.get('/category/:category', getProductsByCategory);
 router.get('/:id/related', getRelatedProducts);
 router.get('/:id', getProductById);
