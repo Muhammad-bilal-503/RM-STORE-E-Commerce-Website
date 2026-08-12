@@ -42,7 +42,10 @@ const PlaceOrderPage = () => {
           image: item.image,
           price: item.price,
           product: item._id,
-          variant: item.selectedVariant,
+          variant: {
+            name: item.variantName,
+            size: item.selectedVariant,
+          },
         })),
         shippingAddress,
         paymentMethod,

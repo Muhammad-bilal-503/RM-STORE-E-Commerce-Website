@@ -22,6 +22,35 @@ const addOrderItems = asyncHandler(async (req, res) => {
     res.status(400);
     throw new Error('No order items');
   } else {
+    // Validate stock availability and decrement it for each item before
+    // creating the order, so the database never goes negative or drifts
+    // from what was actually sold.
+    for (const item of orderItems) {
+      const product = await Product.findById(item.product);
+
+      if (!product) {
+        res.status(404);
+        throw new Error(`Product not found: ${item.name}`);
+      }
+
+      if (product.variants && product.variants.length > 0) {
+        const variant = product.variants.find((v) => v.size === item.variant?.size);
+
+        if (!variant) {
+          res.status(400);
+          throw new Error(`Variant not found for ${item.name}`);
+        }
+
+        if (variant.countInStock < item.qty) {
+          res.status(400);
+          throw new Error(`Not enough stock for ${item.name} (${variant.size})`);
+        }
+
+        variant.countInStock -= item.qty;
+        await product.save();
+      }
+    }
+
     const order = new Order({
       orderItems,
       user: req.user._id,
@@ -229,7 +258,7 @@ const cancelOrder = asyncHandler(async (req, res) => {
     const product = await Product.findById(item.product);
     
     if (product) {
-      const variant = product.variants.find(v => v.size === item.size);
+      const variant = product.variants.find(v => v.size === item.variant?.size);
       
       if (variant) {
         variant.countInStock += item.qty;

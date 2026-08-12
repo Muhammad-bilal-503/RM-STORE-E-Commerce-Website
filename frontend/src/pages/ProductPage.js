@@ -8,6 +8,7 @@ import { formatCurrency } from '../utils/formatCurrency';
 import Rating from '../components/ui/Rating';
 import Message from '../components/ui/Message';
 import Loader from '../components/ui/Loader';
+import ProductCard from '../components/products/ProductCard';
 import { addToCart } from '../slices/cartSlice';
 
 const ProductPage = () => {
@@ -17,6 +18,7 @@ const ProductPage = () => {
   const { userInfo } = useSelector((state) => state.auth);
 
   const [product, setProduct] = useState(null);
+  const [relatedProducts, setRelatedProducts] = useState([]);
   const [selectedVariantIndex, setSelectedVariantIndex] = useState(0);
   const [qty, setQty] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -31,6 +33,13 @@ const ProductPage = () => {
         setSelectedVariantIndex(0);
         setQty(1);
         setError('');
+
+        try {
+          const { data: related } = await axiosInstance.get(`/products/${id}/related`);
+          setRelatedProducts(related);
+        } catch (relatedErr) {
+          setRelatedProducts([]);
+        }
       } catch (err) {
         setError(
           err.response && err.response.data.message
@@ -305,6 +314,18 @@ const ProductPage = () => {
           </Link>{' '}
           to leave a review.
         </p>
+      )}
+
+      {/* Related Products */}
+      {relatedProducts.length > 0 && (
+        <div className="mt-16">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">You May Also Like</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {relatedProducts.map((relatedProduct) => (
+              <ProductCard key={relatedProduct._id} product={relatedProduct} />
+            ))}
+          </div>
+        </div>
       )}
     </div>
   );

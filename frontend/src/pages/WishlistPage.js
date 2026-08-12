@@ -35,12 +35,16 @@ const WishlistPage = () => {
   }, []);
 
   const handleAddToCart = (product) => {
+    const defaultVariant = product.variants && product.variants.length > 0 ? product.variants[0] : null;
+
     dispatch(addToCart({
       _id: product._id,
       name: product.name,
       image: product.image,
-      price: product.price,
-      inStock: product.inStock,
+      price: defaultVariant ? defaultVariant.price : product.price,
+      variantName: defaultVariant?.size || 'Default',
+      selectedVariant: defaultVariant?.size || 'default',
+      countInStock: defaultVariant ? defaultVariant.countInStock : 99,
       qty: 1
     }));
     toast.success(`${product.name} added to cart!`);
