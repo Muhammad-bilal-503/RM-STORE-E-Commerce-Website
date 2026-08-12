@@ -13,6 +13,7 @@ import DashboardPage from './pages/dashboard/DashboardPage';
 import ProductsPage from './pages/products/ProductsPage';
 import AddProduct from './pages/products/AddProduct';
 import OrdersPage from './pages/orders/OrdersPage';
+import RecipesPage from './pages/recipe/RecipesPage';
 import AddRecipe from './pages/recipe/AddRecipe';
 import InventoryPage from './pages/inventory/InventoryPage';
 import AnalyticsPage from './pages/analytics/AnalyticsPage';
@@ -82,8 +83,9 @@ function App() {
             <Route path="add-product" element={<AddProduct />} />
             <Route path="products/:id/edit" element={<AddProduct />} />
             <Route path="orders" element={<OrdersPage />} />
-            <Route path="recipes" element={<AddRecipe />} />
+            <Route path="recipes" element={<RecipesPage />} />
             <Route path="add-recipe" element={<AddRecipe />} />
+            <Route path="recipes/:id/edit" element={<AddRecipe />} />
             <Route path="inventory" element={<InventoryPage />} />
             <Route path="analytics" element={<AnalyticsPage />} />
             <Route path="profile" element={<ProfilePage />} />

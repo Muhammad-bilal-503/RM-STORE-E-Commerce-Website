@@ -1,10 +1,15 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useParams, useNavigate } from "react-router-dom"
 import "./AddRecipe.css"
 import api from "../../services/api"
 
 function AddRecipe() {
+  const { id } = useParams()
+  const navigate = useNavigate()
+  const isEditMode = Boolean(id)
+
   const [recipeData, setRecipeData] = useState({
     title: "",
     description: "",
@@ -31,6 +36,7 @@ function AddRecipe() {
   const [errorMessage, setErrorMessage] = useState("")
   const [successMessage, setSuccessMessage] = useState("")
   const [categories, setCategories] = useState([])
+  const [loadingRecipe, setLoadingRecipe] = useState(isEditMode)
 
   useEffect(() => {
     api
@@ -38,6 +44,37 @@ function AddRecipe() {
       .then(({ data }) => setCategories(data))
       .catch(() => setCategories([]))
   }, [])
+
+  useEffect(() => {
+    if (!isEditMode) return
+
+    api
+      .get(`/recipes/${id}`)
+      .then(({ data }) => {
+        setRecipeData({
+          title: data.title || "",
+          description: data.description || "",
+          ingredients: data.ingredients?.length ? data.ingredients : [{ name: "", quantity: "" }],
+          steps: data.steps?.length ? data.steps : [""],
+          image: data.image || "",
+          preparationTime: data.preparationTime || 0,
+          cookingTime: data.cookingTime || 0,
+          servings: data.servings || 1,
+          difficulty: data.difficulty || "Easy",
+          category: data.category || "",
+          tags: data.tags || [],
+          nutritionalInfo: {
+            calories: data.nutritionalInfo?.calories || 0,
+            protein: data.nutritionalInfo?.protein || 0,
+            carbohydrates: data.nutritionalInfo?.carbohydrates || 0,
+            fat: data.nutritionalInfo?.fat || 0,
+          },
+          isFeatured: data.isFeatured || false,
+        })
+      })
+      .catch(() => setErrorMessage("Failed to load recipe for editing."))
+      .finally(() => setLoadingRecipe(false))
+  }, [id, isEditMode])
 
   const difficultyLevels = ["Easy", "Medium", "Hard"]
 
@@ -152,27 +189,38 @@ function AddRecipe() {
   e.preventDefault();
 
   if (!recipeData.image) {
-    setErrorMessage("Please upload a recipe image before submitting.");
+    setErrorMessage("Please provide a recipe image URL before submitting.");
     return;
   }
 
   try {
+    if (isEditMode) {
+      await api.put(`/recipes/${id}`, recipeData);
+      setSuccessMessage("Recipe updated successfully!");
+      setErrorMessage("");
+      setTimeout(() => navigate("/recipes"), 1000);
+      return;
+    }
+
     await api.post('/recipes', recipeData);
     setSuccessMessage("Recipe added successfully!");
     setErrorMessage("");
   } catch (error) {
-    console.error("Error adding recipe:", error);
-    setErrorMessage(error.response?.data?.message || "An error occurred while adding the recipe.");
+    console.error(`Error ${isEditMode ? "updating" : "adding"} recipe:`, error);
+    setErrorMessage(error.response?.data?.message || `An error occurred while ${isEditMode ? "updating" : "adding"} the recipe.`);
     setSuccessMessage("");
   }
 };
 
+  if (loadingRecipe) {
+    return <div className="add-recipe-container"><p>Loading recipe...</p></div>
+  }
 
   return (
     <div className="add-recipe-container">
       <div className="add-recipe-header">
-        <h1>Add New Recipe</h1>
-        <p>Share your culinary creation with the world</p>
+        <h1>{isEditMode ? "Edit Recipe" : "Add New Recipe"}</h1>
+        <p>{isEditMode ? "Update this recipe's details" : "Share your culinary creation with the world"}</p>
       </div>
 
       {successMessage && <div className="alert alert-success">{successMessage}</div>}
@@ -494,11 +542,11 @@ function AddRecipe() {
 
         {/* Submit Button */}
         <div className="form-actions">
-          <button type="button" className="btn-cancel">
+          <button type="button" className="btn-cancel" onClick={() => navigate("/recipes")}>
             Cancel
           </button>
           <button type="submit" className="btn-submit">
-            Add Recipe
+            {isEditMode ? "Update Recipe" : "Add Recipe"}
           </button>
         </div>
       </form>

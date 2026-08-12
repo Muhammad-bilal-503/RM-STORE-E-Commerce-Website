@@ -5,10 +5,20 @@ import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
 import { FaShoppingBasket, FaLeaf, FaArrowRight } from 'react-icons/fa';
+import { toast } from 'react-hot-toast';
 import ProductCard from '../components/products/ProductCard';
 import RecipeCard from '../components/recipes/RecipeCard';
 
 const HomePage = () => {
+  const [subscribeEmail, setSubscribeEmail] = useState('');
+
+  const handleSubscribe = (e) => {
+    e.preventDefault();
+    if (!subscribeEmail.trim()) return;
+    toast.success("Thanks for subscribing! We'll keep you updated.");
+    setSubscribeEmail('');
+  };
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [Recipes,setRecipes]= useState([]);
@@ -56,7 +66,7 @@ const HomePage = () => {
       </Helmet>
       
       {/* Hero Section */}
-      <section className="relative min-h-screen bg-gradient-to-br from-emerald-900 via-green-800 to-teal-900 text-white overflow-hidden">
+      <section className="relative min-h-[90vh] md:min-h-screen bg-gradient-to-br from-emerald-900 via-green-800 to-teal-900 text-white overflow-hidden flex items-center">
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute inset-0" style={{
@@ -64,7 +74,7 @@ const HomePage = () => {
           }} />
         </div>
         
-        <div className="container mx-auto px-4 flex flex-col lg:flex-row items-center justify-between min-h-screen py-16">
+        <div className="container mx-auto px-4 flex flex-col lg:flex-row items-center justify-between py-20 lg:py-16">
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
@@ -289,7 +299,7 @@ const HomePage = () => {
             {[
               {
                 icon: (
-                  <svg className="w-8 h-8 text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-9 h-9 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 ),
@@ -299,7 +309,7 @@ const HomePage = () => {
               },
               {
                 icon: (
-                  <svg className="w-8 h-8 text-blue-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-9 h-9 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                   </svg>
                 ),
@@ -309,7 +319,7 @@ const HomePage = () => {
               },
               {
                 icon: (
-                  <svg className="w-8 h-8 text-purple-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-9 h-9 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 ),
@@ -419,7 +429,8 @@ const HomePage = () => {
             </p>
             
             <motion.form 
-              className="flex flex-col sm:flex-row max-w-lg mx-auto gap-4"
+              onSubmit={handleSubscribe}
+              className="flex flex-col sm:flex-row max-w-md mx-auto gap-3"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
@@ -427,13 +438,15 @@ const HomePage = () => {
             >
               <input
                 type="email"
+                value={subscribeEmail}
+                onChange={(e) => setSubscribeEmail(e.target.value)}
                 placeholder="Enter your email address"
-                className="px-6 py-4 flex-1 rounded-xl outline-none text-gray-700 shadow-lg focus:shadow-xl transition-shadow placeholder-gray-500"
+                className="px-4 py-2.5 flex-1 rounded-lg outline-none text-sm text-gray-700 shadow-md focus:shadow-lg focus:ring-2 focus:ring-yellow-400 transition-all placeholder-gray-500"
                 required
               />
               <button
                 type="submit"
-                className="bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-green-900 font-bold py-4 px-8 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg"
+                className="bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-green-900 font-semibold text-sm py-2.5 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-md"
               >
                 Subscribe Now
               </button>
