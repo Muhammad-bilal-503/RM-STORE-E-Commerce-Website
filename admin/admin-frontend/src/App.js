@@ -17,6 +17,7 @@ import RecipesPage from './pages/recipe/RecipesPage';
 import AddRecipe from './pages/recipe/AddRecipe';
 import InventoryPage from './pages/inventory/InventoryPage';
 import AnalyticsPage from './pages/analytics/AnalyticsPage';
+import UsersPage from './pages/users/UsersPage';
 import ProfilePage from './pages/profile/ProfilePage';
 
 function App() {
@@ -88,6 +89,7 @@ function App() {
             <Route path="recipes/:id/edit" element={<AddRecipe />} />
             <Route path="inventory" element={<InventoryPage />} />
             <Route path="analytics" element={<AnalyticsPage />} />
+            <Route path="users" element={<UsersPage />} />
             <Route path="profile" element={<ProfilePage />} />
           </Route>
 
