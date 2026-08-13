@@ -5,20 +5,10 @@ import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { motion } from 'framer-motion';
 import { FaShoppingBasket, FaLeaf, FaArrowRight } from 'react-icons/fa';
-import { toast } from 'react-hot-toast';
 import ProductCard from '../components/products/ProductCard';
 import RecipeCard from '../components/recipes/RecipeCard';
 
 const HomePage = () => {
-  const [subscribeEmail, setSubscribeEmail] = useState('');
-
-  const handleSubscribe = (e) => {
-    e.preventDefault();
-    if (!subscribeEmail.trim()) return;
-    toast.success("Thanks for subscribing! We'll keep you updated.");
-    setSubscribeEmail('');
-  };
-
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [Recipes,setRecipes]= useState([]);
@@ -66,7 +56,7 @@ const HomePage = () => {
       </Helmet>
       
       {/* Hero Section */}
-      <section className="relative min-h-[90vh] md:min-h-screen bg-gradient-to-br from-emerald-900 via-green-800 to-teal-900 text-white overflow-hidden flex items-center">
+      <section className="relative min-h-[90vh] md:min-h-screen bg-gradient-to-br from-emerald-900 via-green-800 to-teal-900 text-white overflow-hidden">
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute inset-0" style={{
@@ -74,7 +64,7 @@ const HomePage = () => {
           }} />
         </div>
         
-        <div className="container mx-auto px-4 flex flex-col lg:flex-row items-center justify-between py-20 lg:py-16">
+        <div className="container mx-auto px-4 flex flex-col lg:flex-row lg:items-center justify-between py-12 lg:py-16">
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
@@ -398,63 +388,6 @@ const HomePage = () => {
                 <RecipeCard recipe={recipe} />
               </motion.div>
             ))}
-          </motion.div>
-        </div>
-      </section>
-      
-      {/* Newsletter Section */}
-      <section className="py-20 bg-gradient-to-r from-green-800 via-emerald-800 to-teal-800 text-white relative overflow-hidden">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0" style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M20 20c0 11.046-8.954 20-20 20s-20-8.954-20-20 8.954-20 20-20 20 8.954 20 20zm-30 0c0 5.523 4.477 10 10 10s10-4.477 10-10-4.477-10-10-10-10 4.477-10 10z'/%3E%3C/g%3E%3C/svg%3E")`
-          }} />
-        </div>
-        
-        <div className="container mx-auto px-4 text-center relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-          >
-            <div className="inline-block bg-yellow-400 text-green-900 px-4 py-2 rounded-full text-sm font-semibold mb-6">
-              📧 Stay Updated
-            </div>
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              Join Our <span className="text-yellow-400">Newsletter</span>
-            </h2>
-            <p className="text-xl mb-10 max-w-2xl mx-auto text-green-100">
-              Subscribe to receive updates on new products, special offers, exclusive recipes, and health tips delivered directly to your inbox.
-            </p>
-            
-            <motion.form 
-              onSubmit={handleSubscribe}
-              className="flex flex-col sm:flex-row max-w-md mx-auto gap-3"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              viewport={{ once: true }}
-            >
-              <input
-                type="email"
-                value={subscribeEmail}
-                onChange={(e) => setSubscribeEmail(e.target.value)}
-                placeholder="Enter your email address"
-                className="px-4 py-2.5 flex-1 rounded-lg outline-none text-sm text-gray-700 shadow-md focus:shadow-lg focus:ring-2 focus:ring-yellow-400 transition-all placeholder-gray-500"
-                required
-              />
-              <button
-                type="submit"
-                className="bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-green-900 font-semibold text-sm py-2.5 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-md"
-              >
-                Subscribe Now
-              </button>
-            </motion.form>
-            
-            <p className="text-sm text-green-200 mt-4">
-              We respect your privacy. Unsubscribe at any time.
-            </p>
           </motion.div>
         </div>
       </section>

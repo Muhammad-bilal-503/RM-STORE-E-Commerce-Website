@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate, Link, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-hot-toast';
 import { FaShoppingCart, FaLeaf, FaStar } from 'react-icons/fa';
@@ -14,6 +14,7 @@ import { addToCart } from '../slices/cartSlice';
 const ProductPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const dispatch = useDispatch();
   const { userInfo } = useSelector((state) => state.auth);
 
@@ -309,7 +310,7 @@ const ProductPage = () => {
 
       {!userInfo && (
         <p className="mt-4 text-sm text-gray-500">
-          <Link to="/login" className="text-green-700 hover:underline">
+          <Link to="/login" state={{ from: location }} className="text-green-700 hover:underline">
             Log in
           </Link>{' '}
           to leave a review.

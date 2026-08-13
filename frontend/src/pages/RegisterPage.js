@@ -24,13 +24,15 @@ const RegisterPage = () => {
 
   const { loading, error, userInfo } = useSelector((state) => state.auth);
 
-  const redirect = location.search ? location.search.split('=')[1] : '/';
+  const from = location.state?.from?.pathname
+    ? location.state.from.pathname + (location.state.from.search || '')
+    : '/';
 
   useEffect(() => {
     if (userInfo) {
-      navigate(redirect);
+      navigate(from, { replace: true });
     }
-  }, [navigate, userInfo, redirect]);
+  }, [navigate, userInfo, from]);
 
   useEffect(() => {
     if (error) {
@@ -140,7 +142,8 @@ const RegisterPage = () => {
           <p className="text-gray-600">
             Already have an account?{' '}
             <Link
-              to={redirect ? `/login?redirect=${redirect}` : '/login'}
+              to="/login"
+              state={location.state}
               className="text-blue-600 hover:text-blue-800"
             >
               Sign In

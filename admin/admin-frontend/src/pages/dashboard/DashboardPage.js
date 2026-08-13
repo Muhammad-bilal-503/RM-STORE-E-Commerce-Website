@@ -181,7 +181,10 @@ function DashboardPage() {
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-bold text-gray-900">Recent Orders</h2>
-            <button className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+            <button
+              onClick={() => navigate('/orders')}
+              className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+            >
               View all
             </button>
           </div>
@@ -198,7 +201,7 @@ function DashboardPage() {
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="font-semibold text-gray-900">${order.amount}</p>
+                  <p className="font-semibold text-gray-900">{formatCurrency(order.amount)}</p>
                   <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}>
                     {order.status}
                   </span>
@@ -212,7 +215,10 @@ function DashboardPage() {
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-bold text-gray-900">Top Products</h2>
-            <button className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+            <button
+              onClick={() => navigate('/products')}
+              className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+            >
               View all
             </button>
           </div>

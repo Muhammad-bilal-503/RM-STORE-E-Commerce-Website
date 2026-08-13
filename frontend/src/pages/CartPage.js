@@ -35,7 +35,7 @@ const CartPage = () => {
     if (userInfo) {
       navigate('/shipping');
     } else {
-      navigate('/login?redirect=shipping');
+      navigate('/login', { state: { from: { pathname: '/shipping' } } });
     }
   };
 

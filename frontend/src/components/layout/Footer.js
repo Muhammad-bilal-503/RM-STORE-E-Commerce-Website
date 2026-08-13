@@ -1,10 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FaFacebookF, FaTwitter, FaInstagram, FaPinterest, FaYoutube } from 'react-icons/fa';
+import { toast } from 'react-hot-toast';
 
 /* eslint-disable jsx-a11y/anchor-is-valid */
 // TODO: replace the "#" hrefs below with the store's real social media URLs.
 const Footer = () => {
+  const [subscribeEmail, setSubscribeEmail] = useState('');
+
+  const handleSubscribe = (e) => {
+    e.preventDefault();
+    if (!subscribeEmail.trim()) return;
+    toast.success("Thanks for subscribing! We'll keep you updated.");
+    setSubscribeEmail('');
+  };
+
   return (
     <footer className="bg-gray-900 text-white pt-12 pb-6">
       <div className="container mx-auto px-4">
@@ -169,10 +179,13 @@ const Footer = () => {
             <p className="text-gray-400 mb-4">
               Get the latest recipes, promotions, and culinary tips delivered to your inbox.
             </p>
-            <form className="flex flex-col sm:flex-row gap-2">
+            <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-2">
               <input
                 type="email"
+                value={subscribeEmail}
+                onChange={(e) => setSubscribeEmail(e.target.value)}
                 placeholder="Your email address"
+                required
                 className="flex-grow px-4 py-2 rounded-md text-gray-900 focus:outline-none"
               />
               <button
