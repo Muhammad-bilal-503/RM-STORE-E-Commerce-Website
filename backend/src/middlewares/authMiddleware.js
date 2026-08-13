@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const asyncHandler = require('express-async-handler');
 const User = require('../models/userModel');
+const { roleHasPermission, ROLES } = require('../config/permissions');
 
 /**
  * Protects routes by verifying JWT token
@@ -75,6 +76,50 @@ const admin = (req, res, next) => {
   }
 };
 
+/**
+ * Grants access only if req.user's role has ALL of the given permissions.
+ * Super Admin always passes. Must be used after `protect`.
+ *
+ * This is the actual security boundary — hiding a button in the admin
+ * frontend is not access control, this middleware is. Every protected
+ * admin endpoint that maps to a permission in config/permissions.js should
+ * use this instead of (or alongside) the coarser `admin` check.
+ *
+ * Usage: router.post('/', protect, authorize('products.create'), createProduct)
+ */
+const authorize = (...requiredPermissions) => (req, res, next) => {
+  if (!req.user) {
+    res.status(401);
+    throw new Error('Not authorized');
+  }
+
+  const role = req.user.role || (req.user.isAdmin ? ROLES.SUPER_ADMIN : ROLES.CUSTOMER);
+
+  const hasAll = requiredPermissions.every((perm) => roleHasPermission(role, perm));
+
+  if (!hasAll) {
+    res.status(403);
+    throw new Error('You do not have permission to perform this action');
+  }
+
+  next();
+};
+
+/**
+ * Restricts a route to Super Admin only (e.g. staff/role management).
+ * Must be used after `protect`.
+ */
+const superAdminOnly = (req, res, next) => {
+  const role = req.user?.role || (req.user?.isAdmin ? ROLES.SUPER_ADMIN : ROLES.CUSTOMER);
+
+  if (role !== ROLES.SUPER_ADMIN) {
+    res.status(403);
+    throw new Error('Only a Super Admin can perform this action');
+  }
+
+  next();
+};
+
 // Verified user middleware
 const verified = (req, res, next) => {
   if (req.user && req.user.isVerified) {
@@ -85,4 +130,4 @@ const verified = (req, res, next) => {
   }
 };
 
-module.exports = { protect, admin, verified }; 
+module.exports = { protect, admin, authorize, superAdminOnly, verified }; 

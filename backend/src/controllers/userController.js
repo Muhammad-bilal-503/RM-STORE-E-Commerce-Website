@@ -61,12 +61,24 @@ const authUser = asyncHandler(async (req, res) => {
 
   // Check if user exists and password matches
   if (user && (await user.matchPassword(password))) {
+    // Self-healing migration: accounts created before `role`/`status`
+    // existed won't have those fields set in the database (Mongoose
+    // schema defaults only apply to new documents). Backfill them here so
+    // existing accounts work correctly with the new RBAC system without
+    // needing a manual migration script.
+    if (!user.role) {
+      user.role = user.isAdmin ? 'super_admin' : 'customer';
+      user.status = user.status || 'active';
+      await user.save();
+    }
+
     res.json({
       _id: user._id,
       name: user.name,
       email: user.email,
       isAdmin: user.isAdmin,
       isVerified: user.isVerified,
+      role: user.role,
       token: generateToken(user._id),
     });
   } else {
@@ -82,12 +94,20 @@ const getUserProfile = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id);
 
   if (user) {
+    if (!user.role) {
+      user.role = user.isAdmin ? 'super_admin' : 'customer';
+      user.status = user.status || 'active';
+      await user.save();
+    }
+
     res.json({
       _id: user._id,
       name: user.name,
       email: user.email,
       isAdmin: user.isAdmin,
       isVerified: user.isVerified,
+      role: user.role,
+      status: user.status,
       phone: user.phone,
       address: user.address,
       wishlistCount: user.wishlist.length,
@@ -229,7 +249,9 @@ const resetPassword = asyncHandler(async (req, res) => {
 // @route   GET /api/users
 // @access  Private/Admin
 const getUsers = asyncHandler(async (req, res) => {
-  const users = await User.find({}).select('-password');
+  const users = await User.find({
+    $or: [{ role: 'customer' }, { role: { $exists: false }, isAdmin: false }],
+  }).select('-password');
   res.json(users);
 });
 
@@ -271,7 +293,6 @@ const updateUser = asyncHandler(async (req, res) => {
   if (user) {
     user.name = req.body.name || user.name;
     user.email = req.body.email || user.email;
-    user.isAdmin = req.body.isAdmin !== undefined ? req.body.isAdmin : user.isAdmin;
 
     const updatedUser = await user.save();
 
@@ -280,6 +301,7 @@ const updateUser = asyncHandler(async (req, res) => {
       name: updatedUser.name,
       email: updatedUser.email,
       isAdmin: updatedUser.isAdmin,
+      role: updatedUser.role,
     });
   } else {
     res.status(404);

@@ -13,6 +13,7 @@ const orderRoutes = require('./routes/orderRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const recipeRoutes = require('./routes/recipeRoutes');
 const analyticsRoutes = require('./routes/analyticsRoutes');
+const staffRoutes = require('./routes/staffRoutes');
 
 // Middleware
 const { errorHandler, notFound } = require('./middlewares/errorMiddleware');
@@ -56,6 +57,7 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/payment', paymentRoutes);
 app.use('/api/recipes', recipeRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/staff', staffRoutes);
 
 // Error handling middleware (must be last)
 app.use(notFound);

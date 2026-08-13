@@ -17,7 +17,7 @@ const {
   getWishlist,
   requestPasswordReset,
 } = require('../controllers/userController');
-const { protect, admin } = require('../middlewares/authMiddleware');
+const { protect, authorize, superAdminOnly } = require('../middlewares/authMiddleware');
 
 // Public routes
 router.post('/', registerUser);
@@ -38,13 +38,13 @@ router.route('/wishlist')
 
 router.delete('/wishlist/:productId', protect, removeFromWishlist);
 
-// Admin routes
+// Admin routes - customer account management
 router.route('/')
-  .get(protect, admin, getUsers);
+  .get(protect, authorize('users.read'), getUsers);
 
 router.route('/:id')
-  .get(protect, admin, getUserById)
-  .put(protect, admin, updateUser)
-  .delete(protect, admin, deleteUser);
+  .get(protect, authorize('users.read'), getUserById)
+  .put(protect, authorize('users.update'), updateUser)
+  .delete(protect, superAdminOnly, deleteUser);
 
 module.exports = router; 

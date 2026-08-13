@@ -7,10 +7,11 @@ const {
   getCustomerReport,
   getCategoryPerformance,
 } = require('../controllers/analyticsController');
-const { protect, admin } = require('../middlewares/authMiddleware');
+const { protect, authorize } = require('../middlewares/authMiddleware');
 
-// All analytics endpoints are admin-only and computed live from real data
-router.use(protect, admin);
+// All analytics endpoints require the analytics.read permission and are
+// computed live from real data
+router.use(protect, authorize('analytics.read'));
 
 router.get('/dashboard', getDashboardStats);
 router.get('/sales', getSalesReport);

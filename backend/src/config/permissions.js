@@ -56,7 +56,7 @@ const ROLE_PERMISSIONS = {
     'categories.read',
   ],
   [ROLES.ORDER_MANAGER]: [
-    'orders.read', 'orders.update',
+    'orders.read', 'orders.update', 'users.read',
   ],
   [ROLES.CONTENT_MANAGER]: [
     'categories.read', 'categories.create', 'categories.update', 'categories.delete',
