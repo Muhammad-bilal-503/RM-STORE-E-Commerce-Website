@@ -79,6 +79,7 @@ const authUser = asyncHandler(async (req, res) => {
       isAdmin: user.isAdmin,
       isVerified: user.isVerified,
       role: user.role,
+      status: user.status,
       token: generateToken(user._id),
     });
   } else {

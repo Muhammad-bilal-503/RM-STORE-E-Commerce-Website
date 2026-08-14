@@ -44,7 +44,14 @@ function LoginPage({ onLogin }) {
         throw new Error('This account does not have admin access.');
       }
 
-      // Store token and admin profile
+      // Deactivated/suspended staff accounts are already blocked server-side
+      // (protect middleware), but this gives a clearer message at login time.
+      if (data.status && data.status !== 'active') {
+        throw new Error('This account has been deactivated. Contact a Super Admin.');
+      }
+
+      // Store token and admin profile (including role, used for sidebar
+      // filtering and deciding the post-login landing page)
       localStorage.setItem('adminToken', data.token);
       localStorage.setItem('adminInfo', JSON.stringify(data));
 
@@ -154,7 +161,7 @@ function LoginPage({ onLogin }) {
           
           <div className="mt-6 text-center">
             <p className="text-xs text-gray-500">
-              © 2024 RM Store. All rights reserved.
+              © {new Date().getFullYear()} RM Store. All rights reserved.
             </p>
           </div>
         </div>

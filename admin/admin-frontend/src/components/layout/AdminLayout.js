@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
+import { roleHasPermission, ROLE_LABELS } from '../../config/permissions';
 
 const menuItems = [
   { 
@@ -10,7 +11,8 @@ const menuItems = [
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5a2 2 0 012-2h4a2 2 0 012 2v4H8V5z" />
       </svg>
     ), 
-    path: '/dashboard' 
+    path: '/dashboard',
+    permission: 'analytics.read'
   },
   { 
     text: 'Products', 
@@ -19,7 +21,8 @@ const menuItems = [
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
       </svg>
     ), 
-    path: '/products' 
+    path: '/products',
+    permission: 'products.read'
   },
   { 
     text: 'Orders', 
@@ -28,7 +31,8 @@ const menuItems = [
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
       </svg>
     ), 
-    path: '/orders' 
+    path: '/orders',
+    permission: 'orders.read'
   },
   { 
     text: 'Recipes', 
@@ -37,7 +41,8 @@ const menuItems = [
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
       </svg>
     ), 
-    path: '/recipes' 
+    path: '/recipes',
+    permission: 'recipes.read'
   },
   { 
     text: 'Inventory', 
@@ -46,7 +51,8 @@ const menuItems = [
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
       </svg>
     ), 
-    path: '/inventory' 
+    path: '/inventory',
+    permission: 'inventory.read'
   },
   { 
     text: 'Analytics', 
@@ -55,7 +61,8 @@ const menuItems = [
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
       </svg>
     ), 
-    path: '/analytics' 
+    path: '/analytics',
+    permission: 'analytics.read'
   },
   { 
     text: 'Customers', 
@@ -64,7 +71,8 @@ const menuItems = [
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6-5.13a4 4 0 11-8 0 4 4 0 018 0zm6 3a4 4 0 11-8 0 4 4 0 018 0z" />
       </svg>
     ), 
-    path: '/users' 
+    path: '/users',
+    permission: 'users.read'
   },
   { 
     text: 'Categories', 
@@ -73,7 +81,28 @@ const menuItems = [
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
       </svg>
     ), 
-    path: '/categories' 
+    path: '/categories',
+    permission: 'categories.read'
+  },
+  {
+    text: 'Staff',
+    icon: (
+      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+      </svg>
+    ),
+    path: '/staff',
+    requireSuperAdmin: true
+  },
+  {
+    text: 'Roles',
+    icon: (
+      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+      </svg>
+    ),
+    path: '/roles',
+    requireSuperAdmin: true
   },
 ];
 
@@ -90,6 +119,14 @@ function AdminLayout({ onLogout }) {
       return {};
     }
   })();
+
+  const role = adminInfo.role || (adminInfo.isAdmin ? 'super_admin' : 'customer');
+
+  const visibleMenuItems = menuItems.filter((item) => {
+    if (item.requireSuperAdmin) return role === 'super_admin';
+    if (item.permission) return roleHasPermission(role, item.permission);
+    return true;
+  });
 
   const handleLogout = () => {
     onLogout();
@@ -110,7 +147,7 @@ function AdminLayout({ onLogout }) {
           </div>
         </div>
         <nav className="mt-8 px-4">
-          {menuItems.map((item) => (
+          {visibleMenuItems.map((item) => (
             <button
               key={item.text}
               onClick={() => navigate(item.path)}
@@ -159,7 +196,7 @@ function AdminLayout({ onLogout }) {
               </div>
             </div>
             <nav className="mt-8 px-4">
-              {menuItems.map((item) => (
+              {visibleMenuItems.map((item) => (
                 <button
                   key={item.text}
                   onClick={() => {
@@ -212,7 +249,7 @@ function AdminLayout({ onLogout }) {
                   </div>
                   <div className="hidden md:block text-left">
                     <p className="text-sm font-medium">{adminInfo.name || 'Admin'}</p>
-                    <p className="text-xs text-gray-500">Administrator</p>
+                    <p className="text-xs text-gray-500">{ROLE_LABELS[role] || 'Administrator'}</p>
                   </div>
                   <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
-import { FaTrash, FaShieldAlt } from 'react-icons/fa';
+import { FaTrash } from 'react-icons/fa';
 import api from '../../services/api';
 
 function UsersPage() {
@@ -9,13 +9,13 @@ function UsersPage() {
   const [error, setError] = useState('');
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
-  const [updatingId, setUpdatingId] = useState(null);
 
-  const currentAdminId = (() => {
+  const isSuperAdmin = (() => {
     try {
-      return JSON.parse(localStorage.getItem('adminInfo'))?._id;
+      const info = JSON.parse(localStorage.getItem('adminInfo'));
+      return (info?.role || (info?.isAdmin ? 'super_admin' : '')) === 'super_admin';
     } catch {
-      return null;
+      return false;
     }
   })();
 
@@ -35,19 +35,6 @@ function UsersPage() {
     fetchUsers();
   }, []);
 
-  const toggleAdmin = async (user) => {
-    setUpdatingId(user._id);
-    try {
-      const { data } = await api.put(`/users/${user._id}`, { isAdmin: !user.isAdmin });
-      setUsers((prev) => prev.map((u) => (u._id === user._id ? { ...u, isAdmin: data.isAdmin } : u)));
-      toast.success(`${data.name} is ${data.isAdmin ? 'now an admin' : 'no longer an admin'}`);
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to update user');
-    } finally {
-      setUpdatingId(null);
-    }
-  };
-
   const handleDelete = async (userId) => {
     try {
       await api.delete(`/users/${userId}`);
@@ -62,15 +49,20 @@ function UsersPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold text-gray-900">Customers</h1>
+      <div>
+        <h1 className="text-2xl font-semibold text-gray-900">Customers</h1>
+        <p className="text-sm text-gray-500 mt-1">
+          Looking for staff accounts? Manage those from the Staff page instead.
+        </p>
+      </div>
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
         {loading ? (
-          <div className="p-6 text-center text-gray-500">Loading users...</div>
+          <div className="p-6 text-center text-gray-500">Loading customers...</div>
         ) : error ? (
           <div className="p-6 text-center text-red-600">{error}</div>
         ) : users.length === 0 ? (
-          <div className="p-6 text-center text-gray-500">No users found.</div>
+          <div className="p-6 text-center text-gray-500">No customers found.</div>
         ) : (
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
@@ -79,8 +71,9 @@ function UsersPage() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Joined</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Role</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
+                  {isSuperAdmin && (
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
+                  )}
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
@@ -91,38 +84,20 @@ function UsersPage() {
                     <td className="px-6 py-4 text-sm text-gray-500">
                       {new Date(user.createdAt).toLocaleDateString()}
                     </td>
-                    <td className="px-6 py-4">
-                      <span
-                        className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
-                          user.isAdmin ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-700'
-                        }`}
-                      >
-                        {user.isAdmin ? 'Admin' : 'Customer'}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <button
-                          onClick={() => toggleAdmin(user)}
-                          disabled={updatingId === user._id || user._id === currentAdminId}
-                          className="text-blue-600 hover:text-blue-900 p-2 rounded-lg hover:bg-blue-50 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                          title={user._id === currentAdminId ? "You can't change your own role" : user.isAdmin ? 'Revoke admin access' : 'Grant admin access'}
-                        >
-                          <FaShieldAlt />
-                        </button>
+                    {isSuperAdmin && (
+                      <td className="px-6 py-4 text-right">
                         <button
                           onClick={() => {
                             setUserToDelete(user);
                             setShowDeleteModal(true);
                           }}
-                          disabled={user._id === currentAdminId}
-                          className="text-red-600 hover:text-red-900 p-2 rounded-lg hover:bg-red-50 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                          title={user._id === currentAdminId ? "You can't delete your own account" : 'Delete user'}
+                          className="text-red-600 hover:text-red-900 p-2 rounded-lg hover:bg-red-50 transition-colors"
+                          title="Delete user"
                         >
                           <FaTrash />
                         </button>
-                      </div>
-                    </td>
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>
