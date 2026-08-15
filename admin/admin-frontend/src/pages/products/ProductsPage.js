@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import api from '../../services/api';
@@ -7,31 +7,47 @@ import { formatCurrency } from '../../utils/formatCurrency';
 function ProductsPage() {
   const navigate = useNavigate();
   const [products, setProducts] = useState([]);
-  const [filteredProducts, setFilteredProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
+  const [page, setPage] = useState(1);
+  const [pages, setPages] = useState(1);
 
   const [categories, setCategories] = useState(['all']);
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const { data } = await api.get('/products');
-        // Backend may return either an array or a paginated { products, page, pages } shape
-        const list = Array.isArray(data) ? data : data.products || [];
-        setProducts(list);
-        setFilteredProducts(list);
-      } catch (err) {
-        setError(err.response?.data?.message || err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchProducts = useCallback(async () => {
+    try {
+      setLoading(true);
+      const params = { pageNumber: page };
+      if (searchTerm) params.keyword = searchTerm;
+      if (selectedCategory !== 'all') params.category = selectedCategory;
 
+      const { data } = await api.get('/products', { params });
+      // Backend returns a paginated shape when pageNumber is passed
+      const list = Array.isArray(data) ? data : data.products || [];
+      setProducts(list);
+      setPages(Array.isArray(data) ? 1 : data.pages || 1);
+      setError('');
+    } catch (err) {
+      setError(err.response?.data?.message || err.message);
+    } finally {
+      setLoading(false);
+    }
+  }, [page, searchTerm, selectedCategory]);
+
+  useEffect(() => {
+    // Reset to page 1 whenever the search or category filter changes
+    setPage(1);
+  }, [searchTerm, selectedCategory]);
+
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
+
+  useEffect(() => {
     const fetchCategories = async () => {
       try {
         const { data } = await api.get('/products/categories');
@@ -41,37 +57,16 @@ function ProductsPage() {
       }
     };
 
-    fetchProducts();
     fetchCategories();
   }, []);
-
-  useEffect(() => {
-    let filtered = products;
-    
-    // Filter by search term
-    if (searchTerm) {
-      filtered = filtered.filter(product => 
-        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.category.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-    
-    // Filter by category
-    if (selectedCategory !== 'all') {
-      filtered = filtered.filter(product => product.category === selectedCategory);
-    }
-    
-    setFilteredProducts(filtered);
-  }, [searchTerm, selectedCategory, products]);
 
   const handleDeleteProduct = async (productId) => {
     try {
       await api.delete(`/products/${productId}`);
-      const updatedProducts = products.filter(product => product._id !== productId);
-      setProducts(updatedProducts);
       toast.success('Product deleted successfully!');
       setShowDeleteModal(false);
       setProductToDelete(null);
+      fetchProducts();
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to delete product');
     }
@@ -82,17 +77,6 @@ function ProductsPage() {
     if (stock < 10) return { text: 'Low Stock', color: 'bg-yellow-100 text-yellow-800' };
     return { text: 'In Stock', color: 'bg-green-100 text-green-800' };
   };
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading products...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6">
@@ -151,12 +135,17 @@ function ProductsPage() {
 
       {/* Products Grid/Table */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        {error ? (
+        {loading ? (
+          <div className="p-12 text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading products...</p>
+          </div>
+        ) : error ? (
           <div className="p-6 text-center">
             <div className="text-red-600 text-6xl mb-4">⚠️</div>
             <p className="text-red-600 font-medium">Error: {error}</p>
           </div>
-        ) : filteredProducts.length === 0 ? (
+        ) : products.length === 0 ? (
           <div className="p-12 text-center">
             <div className="text-gray-400 text-6xl mb-4">📦</div>
             <h3 className="text-lg font-medium text-gray-900 mb-2">No products found</h3>
@@ -194,7 +183,7 @@ function ProductsPage() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {filteredProducts.map((product) => {
+                {products.map((product) => {
                   const stockStatus = getStockStatus(product.stock || product.variants?.reduce((total, v) => total + v.countInStock, 0) || 0);
                   return (
                     <tr key={product._id} className="hover:bg-gray-50 transition-colors duration-200">
@@ -260,6 +249,26 @@ function ProductsPage() {
           </div>
         )}
       </div>
+
+      {pages > 1 && (
+        <div className="flex justify-center items-center gap-2">
+          <button
+            disabled={page <= 1}
+            onClick={() => setPage((p) => p - 1)}
+            className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm hover:bg-gray-50 disabled:opacity-50 transition-colors"
+          >
+            Previous
+          </button>
+          <span className="text-sm text-gray-600">Page {page} of {pages}</span>
+          <button
+            disabled={page >= pages}
+            onClick={() => setPage((p) => p + 1)}
+            className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm hover:bg-gray-50 disabled:opacity-50 transition-colors"
+          >
+            Next
+          </button>
+        </div>
+      )}
 
       {/* Delete Confirmation Modal */}
       {showDeleteModal && (

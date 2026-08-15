@@ -1,12 +1,14 @@
 // controllers/productController.js
 const Product = require('../models/productModel');
 
-// Fetch all products with filtering (no pagination)
+// Fetch products with filtering. Pagination is opt-in: pass ?pageNumber=
+// to get a paginated { products, page, pages, total } response (used by
+// the admin Products page). Without it, returns the full filtered array as
+// before — the customer-facing browse page and homepage rely on getting
+// the complete catalog for their own client-side filtering/category tiles.
 exports.getProducts = async (req, res) => {
   try {
-    // Pagination variables removed
-
-    // Filters (same as before)
+    // Filters
     const keyword = req.query.keyword
       ? {
           name: {
@@ -35,14 +37,28 @@ exports.getProducts = async (req, res) => {
       ...ratingFilter,
     };
 
-    // Count all filtered products (optional, can skip if not needed)
-    const count = await Product.countDocuments(filter);
+    const sortOptions = req.query.sortBy ? { [req.query.sortBy]: req.query.order || -1 } : { createdAt: -1 };
 
-    // Find all filtered products without limit or skip
-    const products = await Product.find(filter)
-      .sort(req.query.sortBy ? { [req.query.sortBy]: req.query.order || -1 } : { createdAt: -1 });
+    if (req.query.pageNumber) {
+      const pageSize = Number(req.query.pageSize) || 10;
+      const page = Number(req.query.pageNumber) || 1;
 
-    // Return products only (no pagination info)
+      const count = await Product.countDocuments(filter);
+      const products = await Product.find(filter)
+        .sort(sortOptions)
+        .limit(pageSize)
+        .skip(pageSize * (page - 1));
+
+      return res.json({
+        products,
+        page,
+        pages: Math.ceil(count / pageSize),
+        total: count,
+      });
+    }
+
+    // No pagination requested - return the full filtered list (unchanged behavior)
+    const products = await Product.find(filter).sort(sortOptions);
     res.json(products);
 
   } catch (error) {
