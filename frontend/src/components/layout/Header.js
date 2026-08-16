@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { FaShoppingCart, FaUser, FaHeart, FaSearch, FaBars, FaTimes } from 'react-icons/fa';
 import { logout } from '../../slices/userSlice';
@@ -13,6 +13,7 @@ const Header = () => {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
   
   const { cartItems } = useSelector((state) => state.cart);
   const { userInfo } = useSelector((state) => state.auth);
@@ -46,46 +47,42 @@ const Header = () => {
   };
   
   return (
-    <header className="bg-white shadow-md">
+    <header className="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-30">
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between py-4">
+        <div className="flex items-center justify-between py-3">
           {/* Logo */}
-          <Link to="/" className="flex items-center">
-            <span className="text-2xl font-bold text-green-600">RM STORE</span>
+          <Link to="/" className="flex items-center gap-2 group">
+            <span className="w-9 h-9 rounded-xl bg-gradient-to-br from-green-600 to-emerald-700 text-white flex items-center justify-center text-lg font-bold shadow-sm group-hover:scale-105 transition-transform duration-200">
+              R
+            </span>
+            <span className="text-2xl font-bold text-green-700">RM STORE</span>
           </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex space-x-8">
-            <Link
-              to="/"
-              className="text-gray-700 hover:text-green-600 font-medium"
-            >
-              Home
-            </Link>
-            <Link
-              to="/products"
-              className="text-gray-700 hover:text-green-600 font-medium"
-            >
-              Shop
-            </Link>
-            <Link
-              to="/recipes"
-              className="text-gray-700 hover:text-green-600 font-medium"
-            >
-              Recipes
-            </Link>
-            <Link
-              to="/about"
-              className="text-gray-700 hover:text-green-600 font-medium"
-            >
-              About
-            </Link>
-            <Link
-              to="/contact"
-              className="text-gray-700 hover:text-green-600 font-medium"
-            >
-              Contact
-            </Link>
+            {[
+              { to: '/', label: 'Home' },
+              { to: '/products', label: 'Shop' },
+              { to: '/recipes', label: 'Recipes' },
+              { to: '/about', label: 'About' },
+              { to: '/contact', label: 'Contact' },
+            ].map((link) => {
+              const isActive = location.pathname === link.to;
+              return (
+                <Link
+                  key={link.to}
+                  to={link.to}
+                  className={`relative font-medium transition-colors duration-200 pb-1 ${
+                    isActive ? 'text-green-700' : 'text-gray-700 hover:text-green-600'
+                  }`}
+                >
+                  {link.label}
+                  {isActive && (
+                    <span className="absolute left-0 right-0 -bottom-0.5 h-0.5 bg-green-600 rounded-full" />
+                  )}
+                </Link>
+              );
+            })}
           </nav>
 
           {/* Search Form */}

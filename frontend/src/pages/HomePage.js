@@ -56,7 +56,7 @@ const HomePage = () => {
       </Helmet>
       
       {/* Hero Section */}
-      <section className="relative min-h-[90vh] md:min-h-screen bg-gradient-to-br from-emerald-900 via-green-800 to-teal-900 text-white overflow-hidden">
+      <section className="relative min-h-[85vh] md:min-h-[90vh] bg-gradient-to-br from-emerald-900 via-green-800 to-teal-900 text-white overflow-hidden">
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute inset-0" style={{
@@ -64,26 +64,26 @@ const HomePage = () => {
           }} />
         </div>
         
-        <div className="container mx-auto px-4 flex flex-col lg:flex-row lg:items-center justify-between py-12 lg:py-16">
+        <div className="container mx-auto px-4 flex flex-col lg:flex-row lg:items-center justify-between py-8 lg:py-10">
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.7 }}
-            className="lg:w-1/2 mb-12 lg:mb-0 z-10"
+            className="lg:w-1/2 mb-8 lg:mb-0 z-10"
           >
-            <div className="inline-block bg-yellow-400 text-green-900 px-4 py-2 rounded-full text-sm font-semibold mb-6">
+            <div className="inline-block bg-yellow-400 text-green-900 px-4 py-2 rounded-full text-sm font-semibold mb-4">
               🌟 Premium Quality Since 2020
             </div>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
+            <h1 className="text-4xl md:text-5xl lg:text-5xl font-bold mb-4 leading-tight">
               Premium <span className="text-yellow-400">Food Products</span> for Healthy Living
             </h1>
-            <p className="text-xl mb-8 text-green-100 leading-relaxed">
+            <p className="text-lg lg:text-xl mb-6 text-green-100 leading-relaxed">
               Discover our curated collection of premium flours, rice, honey, dry fruits, dates, and spices. 
               Sourced directly from the finest farms and producers.
             </p>
             
             {/* Feature Pills */}
-            <div className="flex flex-wrap gap-3 mb-8">
+            <div className="flex flex-wrap gap-3 mb-6">
               <span className="bg-green-700 bg-opacity-50 px-4 py-2 rounded-full text-sm flex items-center">
                 <FaLeaf className="mr-2" /> 100% Organic
               </span>
@@ -98,14 +98,14 @@ const HomePage = () => {
             <div className="flex flex-col sm:flex-row gap-4">
               <Link
                 to="/products"
-                className="bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-green-900 font-bold py-4 px-8 rounded-xl inline-flex items-center justify-center transition-all duration-300 transform hover:scale-105 shadow-lg"
+                className="bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-green-900 font-bold py-3 px-8 rounded-xl inline-flex items-center justify-center transition-all duration-300 transform hover:scale-105 shadow-lg"
               >
                 <FaShoppingBasket className="mr-3" />
                 Explore Products
               </Link>
               <Link
                 to="/about"
-                className="bg-transparent hover:bg-white hover:text-green-900 text-white font-bold py-4 px-8 rounded-xl border-2 border-white inline-flex items-center justify-center transition-all duration-300 backdrop-blur-sm"
+                className="bg-transparent hover:bg-white hover:text-green-900 text-white font-bold py-3 px-8 rounded-xl border-2 border-white inline-flex items-center justify-center transition-all duration-300 backdrop-blur-sm"
               >
                 <FaLeaf className="mr-3" />
                 Our Story
@@ -124,11 +124,11 @@ const HomePage = () => {
               <div className="absolute -top-8 -left-8 w-24 h-24 bg-yellow-400 rounded-full opacity-20 animate-pulse"></div>
               <div className="absolute -bottom-12 -right-12 w-32 h-32 bg-green-300 rounded-full opacity-20 animate-pulse delay-1000"></div>
               
-              <div className="bg-white bg-opacity-10 backdrop-blur-lg rounded-3xl p-8 shadow-2xl">
+              <div className="bg-white bg-opacity-10 backdrop-blur-lg rounded-3xl p-6 shadow-2xl">
                 <img
                   src="https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
                   alt="RM STORE Premium Products"
-                  className="w-full h-auto rounded-2xl shadow-lg"
+                  className="w-full h-[320px] xl:h-[360px] object-cover rounded-2xl shadow-lg"
                 />
               </div>
             </div>
