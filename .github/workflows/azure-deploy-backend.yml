@@ -13,7 +13,7 @@ on:
   workflow_dispatch:
 
 env:
-  AZURE_WEBAPP_NAME: rm-store-backend # <-- change to your App Service name
+  AZURE_WEBAPP_NAME: rm-store # <-- change to your App Service name
   NODE_VERSION: '18.x'
 
 jobs:
