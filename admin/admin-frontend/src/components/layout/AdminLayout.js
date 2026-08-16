@@ -139,14 +139,14 @@ function AdminLayout({ onLogout }) {
       backgroundImage: `url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23f1f5f9" fill-opacity="0.6"%3E%3Ccircle cx="30" cy="30" r="1.5"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')`
     }}>
       {/* Sidebar for desktop */}
-      <aside className="fixed inset-y-0 left-0 w-64 bg-white shadow-xl hidden md:block border-r border-gray-200">
-        <div className="flex items-center justify-center h-20 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-purple-600">
+      <aside className="fixed inset-y-0 left-0 w-64 bg-white shadow-xl hidden md:flex md:flex-col border-r border-gray-200">
+        <div className="flex-shrink-0 flex items-center justify-center h-20 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-purple-600">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-white">RM Store</h1>
             <p className="text-blue-100 text-sm font-medium">Admin Panel</p>
           </div>
         </div>
-        <nav className="mt-8 px-4">
+        <nav className="flex-1 overflow-y-auto mt-8 px-4">
           {visibleMenuItems.map((item) => (
             <button
               key={item.text}
@@ -166,7 +166,7 @@ function AdminLayout({ onLogout }) {
             </button>
           ))}
         </nav>
-        <div className="absolute bottom-0 left-0 right-0 p-4">
+        <div className="flex-shrink-0 p-4">
           <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-3 border border-blue-100">
             <p className="text-xs text-gray-600 font-medium">RM Store Admin v1.0</p>
             <p className="text-xs text-gray-500">© {new Date().getFullYear()} RM Store</p>
@@ -188,14 +188,14 @@ function AdminLayout({ onLogout }) {
       {mobileMenuOpen && (
         <div className="fixed inset-0 z-10 md:hidden">
           <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)} />
-          <div className="fixed inset-y-0 left-0 w-64 bg-white shadow-2xl">
-            <div className="flex items-center justify-center h-20 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-purple-600">
+          <div className="fixed inset-y-0 left-0 w-64 bg-white shadow-2xl flex flex-col">
+            <div className="flex-shrink-0 flex items-center justify-center h-20 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-purple-600">
               <div className="text-center">
                 <h1 className="text-2xl font-bold text-white">RM Store</h1>
                 <p className="text-blue-100 text-sm font-medium">Admin Panel</p>
               </div>
             </div>
-            <nav className="mt-8 px-4">
+            <nav className="flex-1 overflow-y-auto mt-8 px-4">
               {visibleMenuItems.map((item) => (
                 <button
                   key={item.text}

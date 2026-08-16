@@ -117,7 +117,7 @@ const HomePage = () => {
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.7, delay: 0.3 }}
-            className="lg:w-1/2 relative"
+            className="hidden lg:block lg:w-1/2 relative"
           >
             <div className="relative">
               {/* Floating Elements */}

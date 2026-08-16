@@ -78,3 +78,17 @@ body {
 .fade-out {
   @apply opacity-0;
 } 
+/* Custom select arrow — the browser's native dropdown arrow eats into the
+   right-side padding without the CSS box model accounting for it, which
+   made every <select> look asymmetric (text/padding uneven left vs right).
+   This gives every dropdown site-wide a consistent, properly centered arrow. */
+select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1.1em;
+  padding-right: 2.5rem;
+}
