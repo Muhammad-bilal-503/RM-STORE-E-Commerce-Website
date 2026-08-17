@@ -7,7 +7,7 @@ application (MongoDB, Express, React, Node.js).
 
 ---
 
-## 🌐 Live Deployment
+##  Live Deployment
 
 | Part | Platform | URL |
 |---|---|---|
@@ -21,7 +21,7 @@ Health check: `GET` [/api/health](https://rm-store-hfhaeefehpfyg0g4.centralindia
 
 ---
 
-## 🏗️ Project Structure
+##  Project Structure
 
 This is a monorepo with three independently deployable apps:
 
@@ -38,7 +38,7 @@ RM-STORE-E-Commerce-Website/
 
 ---
 
-## 🧰 Tech Stack
+##  Tech Stack
 
 - **Frontend / Admin**: React, React Router, Redux Toolkit, Tailwind CSS, Framer Motion
 - **Backend**: Node.js, Express, Mongoose
@@ -51,7 +51,7 @@ RM-STORE-E-Commerce-Website/
 
 ---
 
-## 🔐 Roles & Access
+##  Roles & Access
 
 The platform has one public role (**Customer**) and six internal staff
 roles, each with specific permissions enforced on the backend:
@@ -71,7 +71,7 @@ role. Public registration always creates a plain Customer account.
 
 ---
 
-## 🚀 Deployment Overview
+##  Deployment Overview
 
 ### Backend → Azure App Service
 
@@ -100,7 +100,7 @@ role. Public registration always creates a plain Customer account.
   - `REACT_APP_ADMIN_URL` (customer store only, optional — links to the
     admin panel from the header for admin users)
 
-  ⚠️ These are baked in at **build time** — after changing one, you must
+   These are baked in at **build time** — after changing one, you must
   trigger a **Redeploy** from Vercel's Deployments tab for it to take effect.
 
 ### Connecting the pieces
@@ -111,7 +111,7 @@ API. See `DEPLOYMENT.md` for the full step-by-step walkthrough.
 
 ---
 
-## 💻 Local Development
+##  Local Development
 
 ```bash
 # Backend
@@ -138,7 +138,7 @@ instance or a MongoDB Atlas cluster — no code changes needed either way.
 
 ---
 
-## 📋 Features
+##  Features
 
 **Customer store**: browse products/recipes by category, search, product
 variants with real-time stock, cart, checkout (Stripe or Cash on Delivery),
@@ -151,7 +151,7 @@ management.
 
 ---
 
-## 📖 More Documentation
+##  More Documentation
 
 See **`DEPLOYMENT.md`** for the complete step-by-step deployment guide,
 including MongoDB Atlas setup, Azure App Service configuration, and the
