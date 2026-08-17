@@ -11,12 +11,12 @@ application (MongoDB, Express, React, Node.js).
 
 | Part | Platform | URL |
 |---|---|---|
-| **Backend API** | Azure App Service | `https://rm-store-hfhaeefehpfyg0g4.centralindia-01.azurewebsites.net/api` |
-| **Customer Store** | Vercel | `https://rm-store-lake.vercel.app` |
-| **Admin Panel** | Vercel | `https://admin-panel-rmstore.vercel.app` |
+| **Backend API** | Azure App Service | [rm-store-hfhaeefehpfyg0g4.centralindia-01.azurewebsites.net/api](https://rm-store-hfhaeefehpfyg0g4.centralindia-01.azurewebsites.net/api) |
+| **Customer Store** | Vercel | [rm-store-lake.vercel.app](https://rm-store-lake.vercel.app) |
+| **Admin Panel** | Vercel | [admin-panel-rmstore.vercel.app](https://admin-panel-rmstore.vercel.app) |
 | **Database** | MongoDB Atlas | (managed, not self-hosted) |
 
-Health check: `GET /api/health` on the backend URL should return
+Health check: `GET` [/api/health](https://rm-store-hfhaeefehpfyg0g4.centralindia-01.azurewebsites.net/api/health) on the backend URL should return
 `{"status":"ok"}` when everything is running correctly.
 
 ---
